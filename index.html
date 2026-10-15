@@ -278,7 +278,9 @@ h1 span{color:var(--gold)}
 .glam-steps-list .glam-step{margin:0;color:#e1e8ee}
 .glam-steps-list .glam-step input{margin-top:3px}
 .glam-live-hint{font-size:11px;color:#b4c5d8;line-height:1.7;margin:11px 0 0}
-.glam-live-hint a{color:#edd2a4}
+.glam-live-hint a,.glam-live-hint button{color:#edd2a4}
+.glam-live-hint button{font:inherit;background:transparent;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.glam-live-hint button:disabled{opacity:.6;cursor:wait}
 .glam-instructions{margin:13px 0 11px;padding:12px;border-radius:10px;background:#111e2f;border:1px solid #35475c}
 .glam-instructions-title{font-size:10px;color:#e9c88e;letter-spacing:.11em;text-transform:uppercase;font-weight:850;margin-bottom:9px}
 .glam-step{display:flex;align-items:flex-start;gap:9px;margin:9px 0;color:#e1e8ee;font-size:12px;line-height:1.5;cursor:pointer}.glam-step input{flex:none;margin-top:3px;accent-color:#8ac1ac}.glam-step.is-done span{text-decoration:line-through;color:#94afa6}
@@ -352,7 +354,7 @@ h1 span{color:var(--gold)}
     <div id="glamStats" class="glam-stats"></div>
     <section class="glam-searchbox" aria-label="Find glamour pieces"><h3>Find a glamour piece</h3><p class="glam-muted">Search the current XIVAPI item database for glamour names, or choose an offline ready-made guide. Live names are not the same as verified drop instructions; add or edit the exact route below.</p>
       <div class="glam-searchrow"><input id="glamSearch" type="search" maxlength="110" autocomplete="off" placeholder="Try Calfskin Rider's Jacket, Edenmorn..." aria-label="Glamour item name"><button id="glamSearchBtn" class="btn primary" type="button">Search items</button><button id="glamAddTyped" class="btn" type="button" title="Add the exact name typed above, including items not found in the catalogue">＋ Add typed name</button></div>
-      <div class="glam-search-status" id="glamSearchStatus" role="status">Search ready-made guides offline or look up more items online. You can add any name even without internet.</div><p class="glam-live-hint">For the best chance of live search, publish this page over HTTPS (e.g. GitHub Pages). <a href="https://v2.xivapi.com/api/search?sheets=Item&amp;fields=Name&amp;query=Name%7E%22Edenmorn%22&amp;limit=3" target="_blank" rel="noopener noreferrer">Test XIVAPI connection ↗</a> · If the test opens JSON but search fails here, the browser may be blocking cross-origin requests.</p><div id="glamResults" class="glam-results" aria-label="Item results"></div>
+      <div class="glam-search-status" id="glamSearchStatus" role="status">Search ready-made guides offline or look up more items online. You can add any name even without internet.</div><p class="glam-live-hint">For the best chance of live search, publish this page over HTTPS (e.g. GitHub Pages). <button id="glamTestLive" type="button">Test live search here</button> · <a href="https://v2.xivapi.com/api/search?sheets=Item&amp;fields=Name&amp;query=Name%7E%22Edenmorn%22&amp;limit=3" target="_blank" rel="noopener noreferrer">Open API JSON ↗</a> · Opening JSON in a separate tab does not test whether this website can read API results.</p><div id="glamResults" class="glam-results" aria-label="Item results"></div>
       <div class="glam-preset-label">Try a verified route</div><div class="glam-quick" id="glamQuickPicks"></div>
     </section>
     <div class="glam-heading"><h3>Your wardrobe ✨</h3><select class="glam-select" id="glamFilter" aria-label="Filter glamour farming tiles"><option value="all">All pieces</option><option value="todo">Still farming</option><option value="collected">Collected</option></select></div>
@@ -1167,24 +1169,53 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
    const json=await response.json();
    if(seq!==searchSeq)return;
    if(!Array.isArray(json.results))throw Error('Unexpected API result');
-   const verified=local.filter(x=>x.verified),seen=new Set(verified.map(x=>x.name.toLowerCase())),online=[];
+   const verified=local.filter(x=>x.verified),seen=new Set(verified.map(x=>x.name.toLowerCase()));
+   const online=[],apiNames=new Set(),alreadyShown=new Set();
    for(const r of json.results){
     const name=typeof r?.fields?.Name==='string'?r.fields.Name.trim():'';
-    if(!name||seen.has(name.toLowerCase()))continue;
-    seen.add(name.toLowerCase());const preset=getResult(name);
+    if(!name)continue;
+    const key=name.toLowerCase();
+    if(apiNames.has(key))continue;
+    apiNames.add(key);
+    // Count XIVAPI matches *before* filtering results already present in the offline catalogue.
+    // Previously a successful exact-name search misleadingly displayed "0 live matches".
+    if(seen.has(key)){alreadyShown.add(key);continue}
+    seen.add(key);const preset=getResult(name);
     online.push({name,level:Number(r.fields?.LevelEquip)||0,verified:!!preset,...(preset||{})});
    }
    const available=[...verified,...online].slice(0,29);
    // Retain a manual entry whenever no exact match has been returned.
    if(!available.some(x=>x.name.toLowerCase()===q.toLowerCase()))available.push({name:q,manual:true,verified:false});
    paintResults(available);
-   status(`${verified.length} built-in guide(s), ${online.length} live item match(es). Items without verified acquisition steps can be added as custom plans.`);
+   if(apiNames.size){
+    status(`✓ XIVAPI connected · ${apiNames.size} item match(es) found online (${alreadyShown.size} already displayed as built-in guides, ${online.length} additional item(s)). Acquisition routes for non-curated items still need verification.`);
+   }else{
+    status(`✓ XIVAPI connected · No item-name matches for “${q}”. Try a shorter search term, or add this item manually.`);
+   }
   }catch(e){
    if(seq!==searchSeq)return;
    paintResults(local);
    status(`Live search unavailable (${e?.name==='AbortError'?'request timed out':String(e?.message||'network/CORS error').slice(0,75)}). Test the XIVAPI link above; if it works but this search does not, try hosting the app over HTTPS. You can still add an item by name.`);
   }finally{clearTimeout(timeout)}
  }
+ // Unlike a JSON link opened in a new tab, this tests fetch/CORS from the app's own origin.
+ async function testLiveSearch(){
+  const button=$('glamTestLive');if(button.disabled)return;
+  button.disabled=true;clearTimeout(searchTimer);++searchSeq;
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+  status('Testing a live XIVAPI request from this website…');
+  try{
+   const url='https://v2.xivapi.com/api/search?'+new URLSearchParams({sheets:'Item',fields:'Name',query:'Name~"Edenmorn"',limit:'3',language:'en'});
+   const response=await fetch(url,{signal:controller.signal,mode:'cors'});
+   if(!response.ok)throw Error('HTTP '+response.status);
+   const data=await response.json();
+   if(!Array.isArray(data.results))throw Error('Unexpected API response');
+   status(`✓ Live search connected from your website! XIVAPI returned ${data.results.length} sample item(s). Search above for any glamour piece.`);
+  }catch(e){
+   status(`✕ Live search test failed from this website (${e?.name==='AbortError'?'request timed out':String(e?.message||'network/CORS issue').slice(0,100)}). Opening JSON in another tab does not bypass CORS; check browser developer tools for details.`);
+  }finally{clearTimeout(timeout);button.disabled=false}
+ }
+ $('glamTestLive').addEventListener('click',testLiveSearch);
  $('glamSearch').addEventListener('input',e=>{
   const q=e.target.value.trim();clearTimeout(searchTimer);searchSeq++;
   matchPreset(q);
