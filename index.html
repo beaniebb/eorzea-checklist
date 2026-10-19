@@ -25,7 +25,8 @@
 .adv-checkbox.is-checked{background:#253f3e;border-color:#5a8b7b}
 .adv-checkbox input{width:17px;height:17px;accent-color:#e4bd79;flex:none;margin:0;cursor:pointer}
 .adv-checkbox span{overflow-wrap:anywhere}
-.adv-expand{color:#e1c78e;font-size:12px;background:transparent;border:1px solid #46556d;border-radius:9px;padding:6px 10px;flex:none}
+.adv-roulette-list{grid-template-columns:minmax(0,1fr)}
+.adv-expand{min-width:36px;font-weight:800;font-size:16px;line-height:1.2; color:#e1c78e;font-size:12px;background:transparent;border:1px solid #46556d;border-radius:9px;padding:6px 10px;flex:none}
 .adv-collapse{margin-top:12px;padding-top:12px;border-top:1px solid #33445a}
 .adv-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}
 .adv-select,.adv-input{background:#0e192b;color:#f4eddf;border:1px solid #4a5a74;border-radius:8px;padding:8px 10px;max-width:100%;min-width:0}
@@ -51,7 +52,7 @@
 .adv-badge{color:#dec999;background:#27394b;border:1px solid #4b5a6f;padding:5px 10px;border-radius:20px;font-size:11px}
 .adv-subtitle{margin:0 0 13px;color:var(--muted);font-size:12px}
 .adv-empty{padding:20px;border-radius:11px;border:1px dashed #4a5b70;color:#b3c1d2;font-size:13px}
-.adv-board{border:1px solid #35485d;border-radius:14px;background:#101b2b;padding:18px;margin-bottom:20px}
+.adv-time-settings{border:1px solid #70613f;background:linear-gradient(125deg,#263349,#182739);border-radius:13px;padding:18px;margin:18px 0 22px}.adv-time-settings h3{margin:0 0 9px;font:normal 22px Georgia,serif}.adv-time-settings label{display:block;font-size:12px;font-weight:700;color:#d5c49f;margin-bottom:7px}.adv-time-settings select{width:min(100%,490px)}.adv-time-settings .adv-small{margin-top:9px}.personal-task-group{margin-top:14px}.personal-task-group h4{font-size:13px;color:#e7c993;margin:0 0 7px}.personal-task-group .task{background:#19283b;border:1px solid #354861;border-radius:9px;padding:11px;margin:7px 0}.adv-board{border:1px solid #35485d;border-radius:14px;background:#101b2b;padding:18px;margin-bottom:20px}
 .adv-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .adv-chip{background:#263b4c;border:1px solid #55687d;color:#f2dbc0;padding:5px 9px;border-radius:40px;font-size:11px}
 .adv-compact-check{appearance:none;width:22px;height:22px;accent-color:#a9d2b3;cursor:pointer;flex:none}
@@ -301,35 +302,31 @@ h1 span{color:var(--gold)}
 <body>
 <main class="container">
   <div class="topline">
-    <div><div class="eyebrow">A little adventurer's organizer</div><h1>Eorzea <span>Checklist</span></h1><p class="subtitle">Your personal to-do list and endgame command centre. Plan the pulls, earn the loot, and keep your raid goals in sight.</p></div>
+    <div><div class="eyebrow">A little adventurer's organizer</div><h1>Eorzea <span>Checklist</span></h1><p class="subtitle">Your personal to-do list and raid tracker. Plan the pulls, earn the loot, and keep your raid goals in sight.</p></div>
     <div class="actions">
+      <button class="btn" id="configBtn" data-main-view="config" type="button" aria-pressed="false">⚙ Config</button>
       <button class="btn" id="exportBtn" type="button" title="Download your tasks as a JSON file">↧ Backup</button>
       <button class="btn" id="importBtn" type="button" title="Restore tasks from a backup">↥ Restore</button>
       <button class="btn primary" id="addBtn" type="button">＋ New task</button>
     </div>
   </div>
   <nav class="app-nav" aria-label="Main navigation">
-    <button class="nav-btn" data-main-view="checklist" type="button" aria-pressed="false">✧ Adventurer checklist</button>
-    <button class="nav-btn" data-main-view="config" type="button" aria-pressed="false">⚙ Adventurer Config</button>
-    <button class="nav-btn active" data-main-view="endgame" type="button" aria-pressed="true">⚔ Raid command centre</button>
-    <button class="nav-btn" data-main-view="glam" type="button" aria-pressed="false">✂ Glamour farming</button>
+    <button class="nav-btn active" data-main-view="checklist" type="button" aria-pressed="true">✧ To Do List</button>
+    <button class="nav-btn" data-main-view="endgame" type="button" aria-pressed="false">⚔ Raid Tracker</button>
+    <button class="nav-btn" data-main-view="glam" type="button" aria-pressed="false">✂ Glamour</button>
   </nav>
-  <div id="checklistView" class="app-view hidden">
+  <div id="checklistView" class="app-view">
     <div id="adventurerBoard"></div>
   <div class="stats">
     <article class="stat"><div class="heading">Today's progress</div><div class="value" id="dailyProgress">0 / 0</div><div class="note">Daily reset in <strong id="dailyCountdown">—</strong></div><div class="progress"><div id="dailyBar"></div></div></article>
     <article class="stat"><div class="heading">This week's progress</div><div class="value" id="weeklyProgress">0 / 0</div><div class="note">Weekly reset in <strong id="weeklyCountdown">—</strong></div><div class="progress"><div id="weeklyBar"></div></div></article>
     <article class="stat"><div class="heading">Adventurer goals</div><div class="value" id="goalProgress">0 / 0</div><div class="note">No timer. Just your own pace.</div><div class="progress"><div id="goalBar"></div></div></article>
   </div>
-  <div class="panel">
-    <div class="toolbar"><div class="pills" role="group" aria-label="Task status filter"><button class="pill active" data-filter="all" type="button">All tasks</button><button class="pill" data-filter="todo" type="button">To do</button><button class="pill" data-filter="done" type="button">Completed</button></div><input id="search" type="search" placeholder="Search your tasks…" aria-label="Search tasks"></div>
-    <div id="taskSections" aria-live="polite"></div>
-  </div>
   </div><!-- /checklistView -->
   <div id="configView" class="app-view hidden"><div id="adventurerConfig"></div></div>
-  <div id="endgameView" class="app-view">
+  <div id="endgameView" class="app-view hidden">
     <section class="raid-hero">
-      <div><div class="eyebrow" id="raidHeroEyebrow">Dawntrail · Patch 7.57</div><h2>The <span style="color:#e8c783">Raid Command Centre</span></h2>
+      <div><div class="eyebrow" id="raidHeroEyebrow">Dawntrail · Patch 7.57</div><h2>The <span style="color:#e8c783">Raid Tracker</span></h2>
       <p>Savage, Ultimates, gear, loot and tomestones — tracked your way. Every number is editable, and nothing connects to your in-game character.</p></div>
       <div class="raid-mark" aria-hidden="true">✥</div>
     </section>
@@ -415,6 +412,17 @@ h1 span{color:var(--gold)}
 <input class="hidden" id="fileInput" type="file" accept="application/json,.json">
 <div id="toast" class="toast hidden" role="status"></div>
 <script>
+/* Shared display clock. The game's UTC reset instants never move with this setting. */
+window.EorzeaClock = (()=>{
+ const key='eorzea-adventurer-v3';
+ const valid=zone=>{if(typeof zone!=='string'||zone.length>80)return false;try{new Intl.DateTimeFormat('en',{timeZone:zone});return true}catch{return false}};
+ const selected=()=>{try{const z=JSON.parse(localStorage.getItem(key)||'{}').timeZone;return valid(z)?z:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC')}catch{return Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'}};
+ const format=(instant,opts={})=>new Intl.DateTimeFormat(undefined,{timeZone:selected(),...opts}).format(new Date(instant));
+ const zoneName=()=>selected().replaceAll('_',' ');
+ return {selected,format,zoneName,valid};
+})();
+</script>
+<script>
 (() => {
   'use strict';
   const KEY = 'eorzea-checklist-v1';
@@ -491,20 +499,24 @@ h1 span{color:var(--gold)}
     const remove=dom('button','icon-btn','×');remove.title='Delete '+t.title;remove.type='button';remove.setAttribute('aria-label',remove.title);remove.addEventListener('click',()=>{if(confirm('Delete "'+t.title+'"?')){tasks=tasks.filter(x=>x.id!==t.id);persist();render()}});
     controls.append(edit,remove);outer.append(controls);return outer;
   }
-  function render(){
-    stats();refreshCountdowns();
-    const container=el('taskSections');container.replaceChildren();
-    for(const g of groups){
-      const subset=tasks.filter(t=>t.frequency===g.key),visible=subset.filter(t=>(filter==='all'||(filter==='done'?complete(t):!complete(t)))&&(t.title+' '+t.category+' '+t.notes).toLowerCase().includes(query));
-      const section=dom('section','section');
-      const head=dom('div','section-head');const h2=dom('h2');h2.append(document.createTextNode(g.name+' '));h2.append(dom('span','accent',g.accent));head.append(h2,dom('span','count',subset.filter(complete).length+' / '+subset.length+' done'));section.append(head);
-      if(!visible.length)section.append(dom('div','empty',subset.length?'No tasks match your filter.':'No tasks here yet. Add one above!'));
-      for(const t of visible)section.append(makeTask(t));
-      container.append(section);
+  function renderPersonal(){
+    const container=el('personalTasks');if(!container)return;
+    container.replaceChildren();
+    const available=groups.map(g=>({...g,items:tasks.filter(t=>t.frequency===g.key)})).filter(g=>g.items.length);
+    if(!available.length){container.append(dom('div','adv-small','No personal tasks yet. Use New task above to add one.'));return}
+    for(const g of available){
+      const section=dom('section','personal-task-group');section.append(dom('h4','',g.name));
+      for(const t of g.items)section.append(makeTask(t));container.append(section);
     }
-    const fmt=new Intl.DateTimeFormat(undefined,{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
-    el('resetNote').textContent='Next daily: '+fmt.format(new Date(nextReset('daily')))+' · Weekly: '+fmt.format(new Date(nextReset('weekly')));
   }
+  function render(){
+    stats();refreshCountdowns();renderPersonal();window.EorzeaAdventurer?.updateProgress?.();
+    el('taskFrequency').options[0].textContent='Every day · '+window.EorzeaClock.format(nextReset('daily'),{hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+    el('taskFrequency').options[1].textContent='Every week · '+window.EorzeaClock.format(nextReset('weekly'),{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+    const fmt={weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'};
+    el('resetNote').textContent='Next daily: '+window.EorzeaClock.format(nextReset('daily'),fmt)+' · Weekly: '+window.EorzeaClock.format(nextReset('weekly'),fmt);
+  }
+  window.EorzeaTasks={refresh:render,renderPersonal,getCounts:()=>Object.fromEntries(groups.map(g=>[g.key,{total:tasks.filter(t=>t.frequency===g.key).length,done:tasks.filter(t=>t.frequency===g.key&&complete(t)).length}]))};
   function openEditor(id=null){
     editingId=id;const t=tasks.find(item=>item.id===id);
     el('editorHeading').textContent=t?'Edit task':'New task';
@@ -522,7 +534,7 @@ h1 span{color:var(--gold)}
   el('addBtn').addEventListener('click',()=>openEditor());el('cancelBtn').addEventListener('click',closeEditor);
   el('editorBackdrop').addEventListener('mousedown',e=>{if(e.target===el('editorBackdrop'))closeEditor()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEditor()});
-  el('search').addEventListener('input',e=>{query=e.target.value.toLowerCase();render()});
+
   document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
     filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});render();
   }));
@@ -814,7 +826,7 @@ h1 span{color:var(--gold)}
   function render(){renderFocusPicker();document.querySelectorAll('[data-raid-tab]').forEach(b=>{const selected=b.dataset.raidTab===activeTab;b.classList.toggle('active',selected);b.setAttribute('aria-selected',String(selected))});
     if(activeTab==='overview')renderOverview();else if(activeTab==='encounters')renderEncounters();else if(activeTab==='gear')renderGear();else if(activeTab==='currencies')renderCurrencies();else renderLoot();}
   function renderResetClock(){const n=byId('raidWeekClock');if(!n)return;const diff=Math.max(0,nextWeek()-new Date()),days=Math.floor(diff/86400000),hours=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000);n.textContent=`${days}d ${hours}h ${mins}m`;
-    const fmt=new Intl.DateTimeFormat(undefined,{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'});byId('raidResetLocal').textContent='Next reset: '+fmt.format(nextWeek())}
+    byId('raidResetLocal').textContent='Next reset: '+window.EorzeaClock.format(nextWeek(),{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'})}
   function showTab(name){if(name!=='currencies')pendingCurrencyDelete=null;activeTab=name;render();}
   function editRaid(id=null){editing=id;const r=id?state.raids.find(x=>x.id===id):makeRaid('','',state.activeTier==='ultimate'?'ultimate':'savage',state.activeExpansion,state.activeTier);if(!r)return;
     byId('raidEditorHeading').textContent=id?'Edit encounter':'New encounter';byId('raidEditorName').value=r.name;byId('raidEditorCode').value=r.code;byId('raidEditorGroup').value=r.group;byId('raidEditorExpansion').innerHTML=optionsExp(r.expansion);byId('raidEditorTier').innerHTML=optionsTier(r.expansion,r.tier);byId('raidEditorStatus').value=r.status;byId('raidEditorBest').value=r.best;byId('raidEditorTotal').value=r.total;byId('raidEditorPhase').value=r.phase;byId('raidEditorNotes').value=r.notes;byId('raidEditorDelete').classList.toggle('hidden',!id);byId('raidEditorBackdrop').classList.remove('hidden');byId('raidEditorName').focus()}
@@ -898,17 +910,19 @@ h1 span{color:var(--gold)}
     ensureTier();currentGear();save();render();
   }
   for(const id of ['raidExpansion','raidTier','raidMainJob'])byId(id).addEventListener('change',updateFocus);
-  window.EorzeaRaid={export:()=>structuredClone(state),import:v=>{state=safeState(v);pendingCurrencyDelete=null;ensureTier();currentGear();save();render()}};
+  window.EorzeaRaid={refresh:render,export:()=>structuredClone(state),import:v=>{state=safeState(v);pendingCurrencyDelete=null;ensureTier();currentGear();save();render()}};
   ensureTier();currentGear();save();render();
   setInterval(()=>{if(lastWeekly!==weekId()){lastWeekly=weekId();render()}else if(activeTab==='overview')renderResetClock()},60000);
 })();
 </script>
+
 
 <script>
 /* Eorzea Checklist — Adventurer configuration + checklists, v3. Fully local, no API */
 (()=>{
 'use strict';
 const KEY='eorzea-adventurer-v3', H=3600000, DAY=86400000, WEEK=7*DAY;
+const DEFAULT_EXPANDED=new Set(['dailyHunts','societies','roulettes','weeklyHunts']);
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const EXP=['A Realm Reborn','Heavensward','Stormblood','Shadowbringers','Endwalker','Dawntrail'];
 const SOC={
@@ -967,13 +981,13 @@ const PANELS=[
  {id:'tails',group:'weekly',title:'Wondrous Tails',glyph:'📖',hint:'Set the expiry shown in your own journal.',single:true},
  {id:'fashion',group:'weekly',title:'Fashion Report',glyph:'✨',hint:'Current-week community infographic link.',single:true},
  {id:'jumbo',group:'weekly',title:'Jumbo Cactpot',glyph:'🎰',hint:'Draw and Early Bird bonus depend on your data centre.',single:true},
- {id:'tomes',group:'weekly',title:'Tomestone cap',glyph:'💎',hint:'Simple weekly completion checkbox; detailed balances remain in Raid HQ.',single:true},
+ {id:'tomes',group:'weekly',title:'Tomestone cap',glyph:'💎',hint:'Detailed balance in Raid Tracker',single:true},
  {id:'faux',group:'weekly',title:'Faux Hollows',glyph:'🦊',hint:'Tell, optional Retell and a permanent rewards wishlist.',list:()=>['Tell','Retell']},
  {id:'goals',group:'goal',title:'One-time goals',glyph:'🌟',hint:'Pick long-term achievements that never reset, or add your own custom goals.',list:()=>GOAL_PRESETS}
 ];
 const DEFS={dailyHunts:['Dawntrail'],societies:['Pelupelu','Yok Huy','Mamool Ja'],roulettes:['Expert','Leveling','Frontline'],weeklyHunts:['Dawntrail'],challenges:['Feeling Lucky','Dungeon Master','Open the Gates'],deliveries:['Nitowikwe','Tiisol Ja'],faux:['Tell','Retell']};
 const ENABLE={dailyHunts:true,societies:true,maps:true,roulettes:true,mini:true,weeklyHunts:true,challenges:true,deliveries:true,tails:true,fashion:true,jumbo:true,tomes:true,faux:true,goals:true};
-function fresh(){return {enabled:{...ENABLE},selections:structuredClone(DEFS),completion:{},map:'garg',mapGatheredAt:0,dc:'Materia',wtExpiry:'',rewards:[],obtained:[],expanded:{},configExpanded:{},configTab:'daily',dailyTab:'daily'}}
+function fresh(){return {enabled:{...ENABLE},selections:structuredClone(DEFS),completion:{},map:'garg',mapGatheredAt:0,dc:'Materia',timeZone:'auto',wtExpiry:'',rewards:[],obtained:[],expanded:{},configExpanded:{},configTab:'daily',dailyTab:'daily'}}
 function clean(v){const base=fresh();if(!v||typeof v!=='object')return base;
  for(const id of Object.keys(ENABLE))base.enabled[id]=v.enabled?.[id]!==false;
  for(const p of PANELS.filter(x=>x.list)){const allowed=new Set(p.list());const values=v.selections?.[p.id];if(Array.isArray(values))base.selections[p.id]=[...new Set(values.filter(x=>typeof x==='string'&&allowed.has(x)))];}
@@ -981,6 +995,7 @@ function clean(v){const base=fresh();if(!v||typeof v!=='object')return base;
  if(MAPS.some(m=>m.id===v.map))base.map=v.map;
  if(Number.isFinite(v.mapGatheredAt)&&v.mapGatheredAt>0)base.mapGatheredAt=v.mapGatheredAt;
  if(['Materia','JP','EU','NA'].includes(v.dc))base.dc=v.dc;
+ if(v.timeZone==='auto'||window.EorzeaClock.valid(v.timeZone))base.timeZone=v.timeZone;
  if(typeof v.wtExpiry==='string'&& /^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(v.wtExpiry))base.wtExpiry=v.wtExpiry;
  for(const k of ['expanded','configExpanded'])if(v[k]&&typeof v[k]==='object'){for(const [id,val] of Object.entries(v[k]))if(PANELS.some(p=>p.id===id)&&typeof val==='boolean')base[k][id]=val}
  for(const k of ['rewards','obtained'])if(Array.isArray(v[k]))base[k]=[...new Set(v[k].filter(x=>typeof x==='string'&&x.length<140))].slice(0,100);
@@ -1000,11 +1015,12 @@ function selected(p,s){return(state.selections[p.id]||[]).includes(s)}
 function toggleSelection(p,s,on){const cur=state.selections[p.id]||[];state.selections[p.id]=on?[...new Set([...cur,s])]:cur.filter(x=>x!==s);save();renderConfig();renderChecklist()}
 const timeago=ms=>{const sec=Math.max(0,Math.ceil(ms/1000));const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60);return (d?d+'d ':'')+h+'h '+m+'m'};
 function nextJumbo(){const utcDay={Materia:6,JP:6,EU:6,NA:0}[state.dc];const utcHour={Materia:9,JP:12,EU:19,NA:2}[state.dc];const d=new Date(),days=(utcDay-d.getUTCDay()+7)%7;let t=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+days,utcHour);if(t<=Date.now())t+=WEEK;return t}
-function jumboStatus(){const next=nextJumbo(),prev=next-WEEK,fmt=d=>new Date(d).toLocaleString(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});return {text:`Next draw: ${fmt(next)} · in ${timeago(next-Date.now())}`,early:Date.now()<prev+H&&Date.now()>=prev?`Early Bird is open · ${timeago(prev+H-Date.now())} left`:`Next Early Bird window: ${fmt(next)}–${new Date(next+H).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}`}}
-function info(p){const map=MAPS.find(m=>m.id===state.map)||MAPS[0];if(p.id==='maps')return `<div class="adv-route">Selected: <strong>${esc(map.name)} · Lv ${map.lv} · ${map.party===1?'Solo':'8-player party'}</strong><div>Sample node: ${esc(map.node)}</div><div>Suggested teleport: <strong>${esc(map.tele)}</strong></div><a href="${map.link}" target="_blank" rel="noopener noreferrer">Gathering nodes ↗</a><div class="adv-small">Gathering a map uses an 18-hour allowance, not the daily reset. Teleport recommendation is for this sample node.</div>${state.mapGatheredAt&&done(p,p.id)?`<div class="adv-timer" data-adv-timer="map">Next allowance in ${timeago(18*H-(Date.now()-state.mapGatheredAt))}</div>`:''}</div>`;
+function jumboStatus(){const next=nextJumbo(),prev=next-WEEK,fmt=d=>window.EorzeaClock.format(d,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),finish=d=>window.EorzeaClock.format(d,{hour:'numeric',minute:'2-digit',timeZoneName:'short'});return {text:`Next draw: ${fmt(next)} · in ${timeago(next-Date.now())}`,early:Date.now()<prev+H&&Date.now()>=prev?`Early Bird is open · ${timeago(prev+H-Date.now())} left`:`Next Early Bird window: ${fmt(next)}–${finish(next+H)}`}}
+function mapLabel(){const remaining=18*H-(Date.now()-state.mapGatheredAt);return state.mapGatheredAt>0&&remaining>0?'Next allowance in '+timeago(remaining):'Now available'}
+function info(p){const map=MAPS.find(m=>m.id===state.map)||MAPS[0];if(p.id==='maps')return `<div class="adv-route">Selected: <strong>${esc(map.name)} · Lv ${map.lv} · ${map.party===1?'Solo':'8-player party'}</strong><div>Sample node: ${esc(map.node)}</div><div>Suggested teleport: <strong>${esc(map.tele)}</strong></div><a href="${map.link}" target="_blank" rel="noopener noreferrer">Gathering nodes ↗</a><div class="adv-small">*Available every 18 real life hours.</div><div class="adv-small">Teleport recommendation is for this sample gathering node.</div><div class="adv-timer" data-adv-timer="map">${mapLabel()}</div></div>`;
  if(p.id==='tails')return `<div class="adv-inline"><label>Journal expiry (your local date/time) <input class="adv-input" aria-label="Wondrous Tails journal expiry" type="datetime-local" data-adv-setting="wtExpiry" value="${esc(state.wtExpiry)}"></label></div><div class="adv-small" data-adv-timer="tails">${tailsLabel()}</div>`;
  if(p.id==='jumbo'){const j=jumboStatus();return `<div class="adv-inline"><label>Data centre <select class="adv-select" data-adv-setting="dc">${[['Materia','OCE / Materia'],['JP','Japan'],['EU','Europe'],['NA','North America']].map(([id,n])=>`<option value="${id}" ${state.dc===id?'selected':''}>${n}</option>`).join('')}</select></label></div><div class="adv-timer" data-adv-timer="jumbo">${esc(j.text)}</div><div class="adv-small">${esc(j.early)}</div>`}
- if(p.id==='fashion')return `<p class="adv-subnote"><a href="https://www.reddit.com/r/ffxiv/search/?q=Fashion%20Report%20Full%20Details&restrict_sr=1&sort=new" target="_blank" rel="noopener noreferrer">Find this week's Fashion Report infographic ↗</a><br><span class="adv-small">Community results update weekly; this opens the newest Reddit search rather than an outdated fixed image.</span></p>`;
+ if(p.id==='fashion')return `<p class="adv-subnote"><a href="https://www.reddit.com/r/ffxiv/search/?q=Fashion%20Report%20Full%20Details&restrict_sr=1&sort=new" target="_blank" rel="noopener noreferrer">This week's Fashion Report ↗</a><br><span class="adv-small">via Reddit</span></p>`;
  if(p.id==='faux')return `<div class="adv-route"><strong>Faux Commander wishlist</strong> · Idyllshire (X:5.7, Y:6.1). <a href="https://ffxiv.consolegameswiki.com/wiki/Faux_Leaf" target="_blank" rel="noopener noreferrer">Vendor rewards ↗</a><div class="adv-small">Unlock a Retell by revealing the large illustration; only one Retell can be earned per week.</div><div class="adv-inline"><label>Faux Leaves wishlist</label></div>${wishlist(false)}</div>`;
  if(p.id==='goals')return `<p class="adv-subnote">Pick preset goals here, or use <b>＋ New task</b> and choose <b>One-time goal</b> to create your own. Both remain permanently complete unless you uncheck them.</p>`;
  if(p.id==='challenges')return `<div class="adv-small"><a href="https://ffxiv.consolegameswiki.com/wiki/Challenge_Log" target="_blank" rel="noopener noreferrer">See requirements for each Challenge Log entry ↗</a></div>`;
@@ -1022,7 +1038,7 @@ function wishlist(config){const all=Object.values(REWARDS).flat();return Object.
 function renderPanel(p,config){const enabled=state.enabled[p.id], entries=allActive(p),doneCount=entries.filter(s=>done(p,s)).length;
  if(!config&&!enabled)return '';
  if(!config&&p.list&&!entries.length)return '';
- const expanded=config?(state.configExpanded[p.id]===true):(state.expanded[p.id]===true);
+ const expanded=config?(state.configExpanded[p.id]===true):(state.expanded[p.id]===true||(state.expanded[p.id]===undefined&&DEFAULT_EXPANDED.has(p.id)));
  let inner='';
  if(config){
   if(p.id==='societies')inner=groupedPeople(p,SOC,true);
@@ -1030,7 +1046,7 @@ function renderPanel(p,config){const enabled=state.enabled[p.id], entries=allAct
   else if(p.id==='challenges')inner=`<div class="adv-tools"><span class="adv-small">Configure all Challenge Log categories</span><span><button class="btn small ghost" type="button" data-adv-bulk="pick" data-adv-category="__all__" data-adv-mode="all">Select all</button> <button class="btn small ghost" type="button" data-adv-bulk="pick" data-adv-category="__all__" data-adv-mode="none">Clear all</button></span></div>`+categoryGrid(true)+info(p);
   else if(p.id==='faux')inner=`<div class="adv-checkgrid">${(p.list?.()||[]).map(s=>configCheck(p,s)).join('')}</div><div class="adv-count">Vendor rewards to keep an eye on</div>${wishlist(true)}`;
   else if(p.id==='maps')inner=`<label class="adv-small" for="mapOption">Choose your map type</label><div class="adv-inline"><select id="mapOption" class="adv-select" data-adv-setting="map">${MAPS.map(m=>`<option value="${m.id}" ${state.map===m.id?'selected':''}>${esc(m.name)} · Lv ${m.lv} · ${m.party===1?'Solo':'8 players'}</option>`).join('')}</select></div>${info(p)}`;
-  else if(p.list)inner=`<div class="adv-checkgrid">${p.list().map(s=>configCheck(p,s)).join('')}</div>`+(p.id==='goals'?info(p):'');
+  else if(p.list)inner=`<div class="adv-checkgrid ${p.id==='roulettes'?'adv-roulette-list':''}">${p.list().map(s=>configCheck(p,s)).join('')}</div>`+(p.id==='goals'?info(p):'');
   else if(['tails','jumbo','fashion'].includes(p.id))inner=info(p);
   else if(p.id==='goals')inner=info(p);
   else inner=`<p class="adv-subnote">No extra configuration needed.</p>`;
@@ -1039,20 +1055,37 @@ function renderPanel(p,config){const enabled=state.enabled[p.id], entries=allAct
   else if(p.id==='deliveries')inner=groupedPeople(p,Object.fromEntries(Object.entries(CD).map(([ex,arr])=>[ex,arr.filter(s=>selected(p,s))]).filter(([,arr])=>arr.length)),false);
   else if(p.id==='challenges')inner=`<div class="adv-tools"><span class="adv-small">Mark all your selected Challenge Log objectives</span><span><button class="btn small ghost" type="button" data-adv-bulk="done" data-adv-category="__all__" data-adv-mode="all">All done</button> <button class="btn small ghost" type="button" data-adv-bulk="done" data-adv-category="__all__" data-adv-mode="none">Undo all</button></span></div>`+categoryGrid(false)+info(p);
   else if(p.id==='faux')inner=`<div class="adv-checkgrid">${entries.map(s=>checklistCheck(p,s)).join('')}</div>${info(p)}`;
-  else if(p.list)inner=`<div class="adv-checkgrid">${entries.map(s=>checklistCheck(p,s)).join('')}</div>`;
+  else if(p.list)inner=`<div class="adv-checkgrid ${p.id==='roulettes'?'adv-roulette-list':''}">${entries.map(s=>checklistCheck(p,s)).join('')}</div>`;
   else inner=`<div class="adv-checkgrid">${checklistCheck(p,p.id,p.id==='maps'?'Gathered map':p.id==='tails'?'Journal handed in':p.id==='fashion'?'Judged Fashion Report':p.id==='jumbo'?'Claimed Jumbo Cactpot / bought tickets':p.id==='tomes'?'Weekly cap reached':p.id==='mini'?'Mini Cactpot completed': 'Completed')}</div>${info(p)}`;
  }
  // Prominent single completion checkbox; grouped panels only use child checks.
  const badge=config?(p.list?`${(state.selections[p.id]||[]).length} chosen`:'Click to customise'):`${doneCount} / ${entries.length} complete`;
- const showButton=!!(p.list||p.id==='maps'||['tails','jumbo','faux','fashion','goals'].includes(p.id));
- return `<article class="adv-tile ${!config&&entries.length&&doneCount===entries.length?'adv-complete':''}"><div class="adv-tile-header"><div class="adv-tile-headline"><div class="adv-glyph">${p.glyph}</div><div><h3>${esc(p.title)}</h3><p>${esc(badge)}</p></div></div>${config?`<label class="adv-toggle"><input aria-label="Show ${esc(p.title)} on checklist" type="checkbox" data-adv-enabled="${p.id}" ${enabled?'checked':''}> Show</label>`:showButton?`<button class="adv-expand" type="button" data-adv-expand="${p.id}" data-adv-place="checklist" aria-expanded="${expanded}">${expanded?'Less −':'Open +'}</button>`:''}${config&&showButton?`<button class="adv-expand" type="button" data-adv-expand="${p.id}" data-adv-place="config" aria-expanded="${expanded}">${expanded?'Close −':'Edit +'}</button>`:''}</div><div class="adv-small" style="margin-top:8px">${esc(p.hint)}</div>${config?expanded?`<div class="adv-collapse">${inner}</div>`:'':p.list||p.id==='faux'?expanded?`<div class="adv-collapse">${inner}</div>`:`<div class="adv-count">${entries.filter(s=>done(p,s)).length} of ${entries.length} ✓</div>`:p.id==='maps'?`<div class="adv-collapse">${checklistCheck(p,p.id,'Gathered map')}${info(p)}</div>`:p.id==='tails'||p.id==='jumbo'?`<div class="adv-collapse">${checklistCheck(p,p.id,p.id==='tails'?'Journal handed in':'Claimed / bought tickets')}${info(p)}</div>`:p.id==='fashion'?`<div class="adv-collapse">${checklistCheck(p,p.id,'Fashion Report judged')}${info(p)}</div>`:`<div class="adv-collapse">${inner}</div>`}</article>`;
+ const showButton=!!(p.list||p.id==='faux'||(config&&['maps','tails','jumbo','fashion','goals'].includes(p.id)));
+ return `<article class="adv-tile ${!config&&entries.length&&doneCount===entries.length?'adv-complete':''}"><div class="adv-tile-header"><div class="adv-tile-headline"><div class="adv-glyph">${p.glyph}</div><div><h3>${esc(p.title)}</h3><p>${esc(badge)}</p></div></div>${config?`<label class="adv-toggle"><input aria-label="Show ${esc(p.title)} on checklist" type="checkbox" data-adv-enabled="${p.id}" ${enabled?'checked':''}> Show</label>`:showButton?`<button class="adv-expand" type="button" data-adv-expand="${p.id}" data-adv-place="checklist" aria-label="${expanded?'Collapse':'Expand'} ${esc(p.title)}" aria-expanded="${expanded}">${expanded?'−':'+'}</button>`:''}${config&&showButton?`<button class="adv-expand" type="button" data-adv-expand="${p.id}" data-adv-place="config" aria-label="${expanded?'Collapse':'Expand'} ${esc(p.title)}" aria-expanded="${expanded}">${expanded?'−':'+'}</button>`:''}</div><div class="adv-small" style="margin-top:8px">${esc(p.hint)}</div>${config?expanded?`<div class="adv-collapse">${inner}</div>`:'':p.list||p.id==='faux'?expanded?`<div class="adv-collapse">${inner}</div>`:`<div class="adv-count">${entries.filter(s=>done(p,s)).length} of ${entries.length} ✓</div>`:p.id==='maps'?`<div class="adv-collapse">${checklistCheck(p,p.id,'Gathered map')}${info(p)}</div>`:p.id==='tails'||p.id==='jumbo'?`<div class="adv-collapse">${checklistCheck(p,p.id,p.id==='tails'?'Journal handed in':'Claimed / bought tickets')}${info(p)}</div>`:p.id==='fashion'?`<div class="adv-collapse">${checklistCheck(p,p.id,'Fashion Report judged')}${info(p)}</div>`:`<div class="adv-collapse">${inner}</div>`}</article>`;
 }
-function renderChecklist(){const cont=$('adventurerBoard');if(!cont)return;captureDetailState(cont,'checklist');let total=0,completed=0,summary='';for(const group of ['daily','weekly']){let html='';for(const p of PANELS.filter(x=>x.group===group&&state.enabled[x.id]&&(!x.list||allActive(x).length))){const entries=allActive(p);total+=entries.length;completed+=entries.filter(s=>done(p,s)).length;html+=renderPanel(p,false)}summary+=`<div class="adv-section-title">${group==='daily'?'☀ Daily adventures':'☾ Weekly pursuits'}</div><div class="adv-grid">${html||'<div class="adv-empty">No tasks chosen. Visit Adventurer Config to enable some.</div>'}</div>`}
+function updateProgress(){
+ const personal=window.EorzeaTasks?.getCounts?.()||{};
+ for(const group of ['daily','weekly','goal']){
+   let total=personal[group]?.total||0,completed=personal[group]?.done||0;
+   for(const p of PANELS.filter(x=>x.group===group&&state.enabled[x.id])){
+     const entries=allActive(p);total+=entries.length;completed+=entries.filter(s=>done(p,s)).length;
+   }
+   const counter=$(group+'Progress'),bar=$(group+'Bar');if(counter)counter.textContent=completed+' / '+total;if(bar)bar.style.width=(total?completed/total*100:0)+'%';
+ }
+}
+function renderChecklist(){const cont=$('adventurerBoard');if(!cont)return;captureDetailState(cont,'checklist');let total=0,completed=0,summary='';for(const group of ['daily','weekly']){let html='';for(const p of PANELS.filter(x=>x.group===group&&state.enabled[x.id]&&(!x.list||allActive(x).length))){const entries=allActive(p);total+=entries.length;completed+=entries.filter(s=>done(p,s)).length;html+=renderPanel(p,false)}summary+=`<div class="adv-section-title">${group==='daily'?'☀ Daily adventures':'☾ Weekly pursuits'}</div><div class="adv-grid">${html||'<div class="adv-empty">No tasks chosen. Visit Config to enable some.</div>'}</div>`}
  if(state.enabled.goals&&(state.selections.goals||[]).length){const p=PANELS.find(x=>x.id==='goals'),entries=allActive(p);total+=entries.length;completed+=entries.filter(s=>done(p,s)).length;summary+=`<div class="adv-section-title">✧ One-time pursuits</div><div class="adv-grid">${renderPanel(p,false)}</div>`;}
- cont.innerHTML=`<div class="adv-header"><div><div class="eyebrow">Choose your adventures</div><h2>Adventurer's journal</h2><p>Only the activities you've selected appear here. Each expansion, society, roulette and challenge has its own checkbox.</p></div><button class="btn" type="button" id="openAdvConfig">⚙ Configure journal</button></div><div class="adv-badges"><span class="adv-badge">${completed} / ${total} selected activities complete</span><span class="adv-badge">Daily reset · 15:00 UTC</span><span class="adv-badge">Weekly reset · Tue 08:00 UTC</span></div>${summary}<div class="adv-board"><div class="adv-tools"><div><h3 style="margin:0">One-time goals & personal tasks</h3><p class="adv-small" style="margin:4px 0 0">Your existing custom tasks remain below; long-term goals never reset.</p></div><button class="btn small" id="advAddTask" type="button">＋ New task</button></div></div>`;
- $('openAdvConfig')?.addEventListener('click',()=>switchView('config'));$('advAddTask')?.addEventListener('click',()=>$('addBtn').click());
+ cont.innerHTML=`<div class="adv-header"><div><div class="eyebrow">Choose your adventures</div><h2>To Do List</h2><p>Only the activities you've selected appear here. Each expansion, society, roulette and challenge has its own checkbox.</p></div></div><div class="adv-badges"><span class="adv-badge">${completed} / ${total} selected activities complete</span><span class="adv-badge">Daily reset · ${window.EorzeaClock.format(Date.parse(cycle('daily'))+DAY,{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'})}</span><span class="adv-badge">Weekly reset · ${window.EorzeaClock.format(Date.parse(cycle('weekly'))+WEEK,{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'})}</span></div>${summary}<div class="adv-board"><div class="adv-tools"><div><h3 style="margin:0">Personal tasks</h3><p class="adv-small" style="margin:4px 0 0">Your existing custom daily, weekly, and one-time tasks appear here.</p></div><button class="btn small" id="advAddTask" type="button">＋ New task</button></div><div id="personalTasks" aria-live="polite"></div></div>`;
+ window.EorzeaTasks?.renderPersonal?.();updateProgress();
+ $('advAddTask')?.addEventListener('click',()=>$('addBtn').click());
 }
-function renderConfig(){const cont=$('adventurerConfig');if(!cont)return;captureDetailState(cont,'config');cont.innerHTML=`<div class="adv-header"><div><div class="eyebrow">Personalise the journal</div><h2>Adventurer Config</h2><p>Switch on the categories you care about. Expand each tile to select its specific activities. Your choices stay saved between visits.</p></div><button class="btn primary" type="button" id="configReturn">✓ Return to checklist</button></div><div class="inline-note">Checkboxes on this page choose <b>what appears</b> in your checklist; completion checkboxes live on the Adventurer tab. Your choices do not reset when the game does.</div>${['daily','weekly','goal'].map(group=>`<div class="adv-section-title">${group==='daily'?'☀ Daily tasks':group==='weekly'?'☾ Weekly tasks':'✧ One-time tasks'}</div><div class="adv-grid">${PANELS.filter(p=>p.group===group).map(p=>renderPanel(p,true)).join('')}</div>`).join('')}<div class="adv-board"><h3 style="margin:0 0 6px">Data & local saves</h3><p class="adv-small">Settings and completions are saved to this browser and included in the global Backup / Restore. Selecting another expansion does not erase the previous expansion's progress for its active reset cycle.</p></div>`;
+function timeZoneOptions(){
+ const preferred=['Australia/Sydney','Australia/Melbourne','Australia/Brisbane','Australia/Adelaide','Australia/Perth','Australia/Hobart','Australia/Darwin','Pacific/Auckland','Asia/Tokyo','Asia/Singapore','Europe/London','America/New_York','America/Los_Angeles','UTC'];
+ const zones=[...new Set([...preferred,...(Intl.supportedValuesOf?.('timeZone')||[])])];
+ const offset=z=>{try{return new Intl.DateTimeFormat('en',{timeZone:z,timeZoneName:'shortOffset',hour:'numeric'}).formatToParts(new Date()).find(x=>x.type==='timeZoneName')?.value||''}catch{return ''}};
+ return `<option value="auto" ${state.timeZone==='auto'?'selected':''}>Device timezone (automatic: ${esc(window.EorzeaClock.zoneName())})</option>`+zones.map((z,i)=>`<option value="${esc(z)}" ${state.timeZone===z?'selected':''}>${i===0?'── Common time zones ──  ':i===preferred.length?'── Other time zones ──  ':''}${esc(z.replaceAll('_',' '))} (${esc(offset(z))})</option>`).join('');
+}
+function renderConfig(){const cont=$('adventurerConfig');if(!cont)return;captureDetailState(cont,'config');cont.innerHTML=`<div class="adv-header"><div><div class="eyebrow">Personalise the journal</div><h2>Config</h2><p>Switch on the categories you care about. Expand each tile to select its specific activities. Your choices stay saved between visits.</p></div><button class="btn primary" type="button" id="configReturn">✓ Return to checklist</button></div><div class="adv-time-settings"><h3>🕒 Time zone</h3><label for="advTimeZone">Display dates and times in</label><select id="advTimeZone" class="adv-select" data-adv-setting="timeZone">${timeZoneOptions()}</select><p class="adv-small">Current display: ${esc(window.EorzeaClock.zoneName())}. Game resets stay fixed at 15:00 UTC daily and Tuesday 08:00 UTC weekly; only the time shown changes (including daylight saving).</p></div><div class="inline-note">Checkboxes on this page choose <b>what appears</b> in your checklist; completion checkboxes live on the To Do List. Your choices do not reset when the game does.</div>${['daily','weekly','goal'].map(group=>`<div class="adv-section-title">${group==='daily'?'☀ Daily tasks':group==='weekly'?'☾ Weekly tasks':'✧ One-time tasks'}</div><div class="adv-grid">${PANELS.filter(p=>p.group===group).map(p=>renderPanel(p,true)).join('')}</div>`).join('')}<div class="adv-board"><h3 style="margin:0 0 6px">Data & local saves</h3><p class="adv-small">Settings and completions are saved to this browser and included in the global Backup / Restore. Selecting another expansion does not erase the previous expansion's progress for its active reset cycle.</p></div>`;
  $('configReturn')?.addEventListener('click',()=>switchView('checklist'));
 }
 function switchView(name){view=name;['checklist','endgame','config','glam'].forEach(k=>{const n=$(k+'View');if(n)n.classList.toggle('hidden',k!==name)});document.querySelectorAll('[data-main-view]').forEach(b=>{const selected=b.dataset.mainView===name;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected))});if(name==='checklist')renderChecklist();if(name==='config')renderConfig();}
@@ -1061,18 +1094,18 @@ document.querySelectorAll('[data-main-view]').forEach(b=>b.addEventListener('cli
 function handleChange(e){const t=e.target,p=PANELS.find(x=>x.id===(t.dataset.advPick||t.dataset.advDone||t.dataset.advEnabled));if(t.dataset.advEnabled){state.enabled[t.dataset.advEnabled]=t.checked;save();renderConfig();renderChecklist();return}
  if(t.dataset.advPick&&p){toggleSelection(p,t.dataset.advEntry,t.checked);return}
  if(t.dataset.advDone&&p){setDone(p,t.dataset.advEntry,t.checked);return}
- if(t.dataset.advSetting){const k=t.dataset.advSetting; if(k==='map'&&MAPS.some(m=>m.id===t.value)){state.map=t.value}else if(k==='dc'&&['Materia','JP','EU','NA'].includes(t.value))state.dc=t.value;else if(k==='wtExpiry')state.wtExpiry=t.value;save();renderConfig();renderChecklist();return}
+ if(t.dataset.advSetting){const k=t.dataset.advSetting; if(k==='map'&&MAPS.some(m=>m.id===t.value)){state.map=t.value}else if(k==='timeZone'&&(t.value==='auto'||window.EorzeaClock.valid(t.value))){state.timeZone=t.value}else if(k==='dc'&&['Materia','JP','EU','NA'].includes(t.value))state.dc=t.value;else if(k==='wtExpiry')state.wtExpiry=t.value;save();renderConfig();renderChecklist();if(k==='timeZone'){window.EorzeaTasks?.refresh?.();window.EorzeaRaid?.refresh?.()}return}
  if(t.dataset.advReward){const k=t.dataset.advReward==='pick'?'rewards':'obtained';state[k]=t.checked?[...new Set([...state[k],t.dataset.advEntry])]:state[k].filter(x=>x!==t.dataset.advEntry);save();renderConfig();renderChecklist();return}}
 function handleClick(e){const b=e.target.closest('button');if(!b)return;
- if(b.dataset.advExpand){const k=b.dataset.advPlace==='config'?'configExpanded':'expanded',p=b.dataset.advExpand;state[k][p]=!state[k][p];save();if(k==='configExpanded')renderConfig();else renderChecklist();return}
+ if(b.dataset.advExpand){const k=b.dataset.advPlace==='config'?'configExpanded':'expanded',p=b.dataset.advExpand;state[k][p]=!(state[k][p]===true||(k==='expanded'&&state[k][p]===undefined&&DEFAULT_EXPANDED.has(p)));save();if(k==='configExpanded')renderConfig();else renderChecklist();return}
  if(b.dataset.advBulk){const p=PANELS.find(x=>x.id==='challenges'),entries=b.dataset.advCategory==='__all__'?Object.values(CHALLENGES).flat():CHALLENGES[b.dataset.advCategory]||[],on=b.dataset.advMode==='all';if(b.dataset.advBulk==='pick'){for(const s of entries){const a=new Set(state.selections.challenges||[]);if(on)a.add(s);else a.delete(s);state.selections.challenges=[...a]}}else{for(const s of entries.filter(s=>selected(p,s))){if(on)state.completion[key(p,s)]=cycle('weekly');else delete state.completion[key(p,s)]}}save();renderConfig();renderChecklist();return}}
 for(const root of ['adventurerBoard','adventurerConfig']){ $(root).addEventListener('change',handleChange);$(root).addEventListener('click',handleClick)}
-window.EorzeaAdventurer={export:()=>JSON.parse(JSON.stringify(state)),import:v=>{state=clean(v);save();renderConfig();renderChecklist()},show:()=>switchView('checklist')};
+window.EorzeaAdventurer={updateProgress,export:()=>JSON.parse(JSON.stringify(state)),import:v=>{state=clean(v);save();renderConfig();renderChecklist();window.EorzeaTasks?.refresh?.();window.EorzeaRaid?.refresh?.()},show:()=>switchView('checklist')};
 // State remains isolated from the older checklist; no original task progress is overwritten.
 save();renderConfig();renderChecklist();
 let last=cycle('daily')+cycle('weekly');
 setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=now;renderChecklist()}
- for(const n of document.querySelectorAll('[data-adv-timer]')){if(n.dataset.advTimer==='tails')n.textContent=tailsLabel();if(n.dataset.advTimer==='jumbo')n.textContent=jumboStatus().text;if(n.dataset.advTimer==='map'){const delta=18*H-(Date.now()-state.mapGatheredAt);if(delta<=0){renderChecklist();break}else n.textContent='Next allowance in '+timeago(delta)}}
+ for(const n of document.querySelectorAll('[data-adv-timer]')){if(n.dataset.advTimer==='tails')n.textContent=tailsLabel();if(n.dataset.advTimer==='jumbo')n.textContent=jumboStatus().text;if(n.dataset.advTimer==='map'){const prev=n.textContent;n.textContent=mapLabel();if(prev!=='Now available'&&n.textContent==='Now available'){renderChecklist();break}}}
 },60000);
 })();
 
