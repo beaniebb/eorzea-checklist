@@ -1,0 +1,1382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111927">
+<title>Eorzea Checklist · FFXIV To-Do Tracker</title>
+<style>
+/* Adventurer's configurable journal, v4 */
+.adv-header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:18px 0 14px}
+.adv-header h2{font:normal clamp(27px,4vw,37px) Georgia,serif;margin:4px 0 5px}
+.adv-header p{font-size:13px;color:var(--muted);margin:0;max-width:700px}
+.adv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:12px 0 24px}
+.adv-tile{background:linear-gradient(145deg,#1a2a40,#121f30);border:1px solid #3a4b64;border-radius:14px;padding:16px;min-width:0}
+.adv-tile.adv-complete{border-color:#56896d;background:linear-gradient(145deg,#1b3938,#12242e)}
+.adv-tile-header{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.adv-tile-header h3{font-size:16px;margin:0 0 3px;font-weight:750}
+.adv-tile-header p{margin:0;font-size:11px;color:#aebdd0}
+.adv-tile-headline{display:flex;align-items:center;gap:9px;min-width:0}
+.adv-glyph{width:35px;height:35px;border:1px solid #536178;border-radius:10px;background:#24344c;display:grid;place-items:center;font-size:19px;flex:none}
+.adv-subnote{color:#a9bdd0;font-size:12px;line-height:1.55;margin:11px 0 0}
+.adv-checkgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:13px}
+.adv-checkbox{border:1px solid #3b4c62;background:#101c2d;padding:10px;border-radius:9px;display:flex;align-items:center;gap:9px;font-size:12px;min-width:0;cursor:pointer}
+.adv-checkbox:hover{border-color:#738bab;background:#1b2c42}
+.adv-checkbox.is-checked{background:#253f3e;border-color:#5a8b7b}
+.adv-checkbox input{width:17px;height:17px;accent-color:#e4bd79;flex:none;margin:0;cursor:pointer}
+.adv-checkbox span{overflow-wrap:anywhere}
+.adv-roulette-list{grid-template-columns:minmax(0,1fr)}
+.adv-expand{min-width:36px;font-weight:800;font-size:16px;line-height:1.2; color:#e1c78e;font-size:12px;background:transparent;border:1px solid #46556d;border-radius:9px;padding:6px 10px;flex:none}
+.adv-collapse{margin-top:12px;padding-top:12px;border-top:1px solid #33445a}
+.adv-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}
+.adv-select,.adv-input{background:#0e192b;color:#f4eddf;border:1px solid #4a5a74;border-radius:8px;padding:8px 10px;max-width:100%;min-width:0}
+.adv-inline label{color:#b6c4d4;font-size:12px}
+.adv-small{font-size:11px;color:#a3b4c7;line-height:1.65}
+.adv-route{margin-top:12px;border:1px solid #556448;background:#1e302f;padding:12px;border-radius:10px;font-size:12px;line-height:1.6}
+.adv-route strong{color:#f0d498}
+.adv-route a,.adv-tile a{color:#f1ca89}
+.adv-count{display:inline-block;margin-top:8px;color:#e6c88e;font-size:11px;font-weight:750}
+.adv-section-title{font:normal 25px Georgia,serif;margin:25px 0 9px;display:flex;align-items:center;gap:11px}
+.adv-section-title:after{content:'';height:1px;background:#39495d;flex:1}
+.adv-full{grid-column:1/-1}
+.adv-category{border:1px solid #35455d;background:#111e30;border-radius:10px;margin:7px 0;overflow:hidden}
+.adv-category summary{list-style:none;display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer}
+.adv-category summary::-webkit-details-marker{display:none}
+.adv-category summary:after{content:'▸';margin-left:auto;color:#e5c383}
+.adv-category[open] summary:after{content:'▾'}
+.adv-category .adv-checkgrid{padding:0 10px 10px;margin:0}
+.adv-category-name{flex:1;font-size:12px;font-weight:650}
+.adv-toggle{display:flex;align-items:center;gap:8px;font-size:12px;border:1px solid #465872;padding:8px 10px;background:#102033;border-radius:10px;cursor:pointer}
+.adv-toggle input{accent-color:#e5c37e;width:18px;height:18px}
+.adv-badges{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.adv-badge{color:#dec999;background:#27394b;border:1px solid #4b5a6f;padding:5px 10px;border-radius:20px;font-size:11px}
+.adv-subtitle{margin:0 0 13px;color:var(--muted);font-size:12px}
+.adv-empty{padding:20px;border-radius:11px;border:1px dashed #4a5b70;color:#b3c1d2;font-size:13px}
+.adv-time-settings{border:1px solid #70613f;background:linear-gradient(125deg,#263349,#182739);border-radius:13px;padding:18px;margin:18px 0 22px}.adv-time-settings h3{margin:0 0 9px;font:normal 22px Georgia,serif}.adv-time-settings label{display:block;font-size:12px;font-weight:700;color:#d5c49f;margin-bottom:7px}.adv-time-settings select{width:min(100%,490px)}.adv-time-settings .adv-small{margin-top:9px}.personal-task-group{margin-top:14px}.personal-task-group h4{font-size:13px;color:#e7c993;margin:0 0 7px}.personal-task-group .task{background:#19283b;border:1px solid #354861;border-radius:9px;padding:11px;margin:7px 0}.adv-board{border:1px solid #35485d;border-radius:14px;background:#101b2b;padding:18px;margin-bottom:20px}
+.adv-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.adv-chip{background:#263b4c;border:1px solid #55687d;color:#f2dbc0;padding:5px 9px;border-radius:40px;font-size:11px}
+.adv-compact-check{appearance:none;width:22px;height:22px;accent-color:#a9d2b3;cursor:pointer;flex:none}
+.adv-stage{color:#a3b5c6;margin:4px 0;font-size:11px}
+.adv-timer{color:#f1d191;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+@media(max-width:800px){.adv-grid{grid-template-columns:1fr}.adv-checkgrid{grid-template-columns:1fr}.adv-full{grid-column:auto}}
+
+:root{--bg:#0c121e;--surface:#121d2d;--surface2:#192639;--border:#293750;--text:#f3eedf;--muted:#a0aec2;--gold:#e4bc71;--gold2:#92764a;--cyan:#80d7d0;--success:#8bc7a4;--red:#eea4a7;--shadow:0 18px 48px rgba(0,0,0,.22);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 80% 0%,#22304a 0%,transparent 40%),linear-gradient(155deg,#0b111e,#131b2c 65%,#0b1019);color:var(--text);font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.container{max-width:1160px;margin:0 auto;padding:30px 22px 80px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.eyebrow{color:var(--gold);text-transform:uppercase;font-size:11px;font-weight:750;letter-spacing:.22em}
+h1{font:normal clamp(32px,5vw,56px)/1.1 Georgia,"Times New Roman",serif;letter-spacing:-.02em;margin:8px 0}
+h1 span{color:var(--gold)}
+.subtitle{color:var(--muted);max-width:560px;margin:10px 0 0}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--border);background:#1c2a3d;border-radius:10px;color:var(--text);padding:10px 14px;transition:background .15s,border-color .15s;white-space:nowrap}
+.btn:hover{background:#293b54;border-color:#51627a}
+.btn.primary{background:linear-gradient(130deg,#f0cd8a,#d7a958);border-color:#e4bc71;color:#172235;font-weight:750}
+.btn.primary:hover{background:#f3d79d}
+.btn.ghost{background:transparent}
+.btn.small{padding:6px 10px;font-size:12px}
+.stats{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;margin:32px 0}
+.stat{background:linear-gradient(160deg,rgba(30,44,65,.96),rgba(17,26,41,.96));border:1px solid var(--border);border-radius:15px;padding:19px 22px;box-shadow:var(--shadow);min-height:138px}
+.stat .heading{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:750}
+.stat .value{font-weight:750;font-size:29px;margin:6px 0 3px;font-variant-numeric:tabular-nums}
+.stat .note{font-size:12px;color:var(--muted)}
+.progress{height:7px;background:#314055;border-radius:20px;overflow:hidden;margin-top:15px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--gold2),#f1d599);border-radius:20px;transition:width .2s}
+.panel{border:1px solid var(--border);background:rgba(16,25,40,.88);border-radius:17px;box-shadow:var(--shadow);overflow:hidden}
+.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.pills{display:flex;gap:7px;flex-wrap:wrap}
+.pill{border-radius:100px;border:1px solid #394b64;background:transparent;color:var(--muted);padding:7px 13px;font-size:13px}
+.pill.active{color:#14243a;background:var(--gold);border-color:var(--gold);font-weight:800}
+#search{background:#0d1727;border:1px solid #35445a;border-radius:10px;color:var(--text);padding:10px 12px;min-width:215px;max-width:100%;outline-offset:2px}
+.section{padding:14px 18px 6px}
+.section+.section{border-top:1px solid var(--border)}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:3px 0 13px;padding:0 4px}
+.section h2{margin:0;font:normal 25px Georgia,serif}
+.section h2 .accent{color:var(--gold)}
+.section-head .count{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:50px;padding:4px 9px}
+.task{display:flex;align-items:flex-start;gap:13px;padding:14px 14px;margin:0 0 8px;border:1px solid #27364c;border-radius:12px;background:rgba(31,44,62,.55);transition:background .15s,border-color .15s}
+.task:hover{background:rgba(37,54,76,.85);border-color:#41536d}
+.task.done{opacity:.58}
+.task input[type=checkbox]{appearance:none;flex:none;margin:4px 0 0;width:22px;height:22px;border-radius:7px;border:1px solid #8390a4;background:#121c2b;cursor:pointer;position:relative}
+.task input[type=checkbox]:checked{background:var(--success);border-color:var(--success)}
+.task input[type=checkbox]:checked:after{content:'✓';position:absolute;top:-4px;left:4px;font-size:19px;color:#142d27;font-weight:bold}
+.task-main{flex:1;min-width:0}
+.task-title{font-size:15px;font-weight:650;word-break:break-word}
+.done .task-title{text-decoration:line-through;text-decoration-color:#8593a3}
+.task-notes{margin-top:3px;color:var(--muted);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.category{font-size:11px;color:var(--cyan);letter-spacing:.04em;margin-top:6px}
+.task-controls{display:flex;gap:3px;flex:none}
+.icon-btn{border:0;background:transparent;color:#a6b3c5;border-radius:7px;padding:5px 8px;font-size:14px}
+.icon-btn:hover{background:#33435b;color:white}
+.empty{padding:22px;color:var(--muted);text-align:center;border:1px dashed #394860;border-radius:11px;margin-bottom:12px}
+.bottom{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:15px 4px 0;font-size:12px;color:var(--muted)}
+.bottom a{color:var(--gold)}
+.modal-backdrop{position:fixed;inset:0;background:rgba(3,7,14,.77);z-index:10;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{width:min(500px,100%);max-height:95vh;overflow:auto;background:#172438;border:1px solid #47556b;border-radius:16px;box-shadow:0 30px 90px #0009;padding:25px}
+.modal h2{font:normal 29px Georgia,serif;margin:0 0 15px}
+.field{display:flex;flex-direction:column;gap:5px;margin:12px 0}
+.field label{font-weight:700;color:#d2ddec;font-size:13px}
+.field input,.field textarea,.field select{background:#0e192a;border:1px solid #41506a;padding:10px 12px;border-radius:9px;color:var(--text);width:100%;min-width:0}
+.field textarea{resize:vertical;min-height:70px}
+.modal-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:20px;flex-wrap:wrap}
+.tip{font-size:12px;color:var(--muted);line-height:1.5}
+.hidden{display:none!important}
+.toast{position:fixed;right:20px;bottom:20px;max-width:300px;background:#263d4a;border:1px solid #567474;color:white;border-radius:12px;padding:10px 15px;z-index:30;box-shadow:var(--shadow)}
+@media(max-width:750px){.container{padding:22px 13px 60px}.stats{grid-template-columns:1fr;gap:10px;margin:22px 0}.stat{min-height:auto;padding:15px}.stat .value{font-size:25px}.section{padding:14px 11px 5px}.task{padding:12px 10px;gap:10px}.toolbar{padding:14px 11px}#search{flex:1;min-width:150px}.section h2{font-size:23px}.task-controls{flex-direction:column}.btn{padding:9px 11px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ── Endgame command centre ─────────────────────────────── */
+.app-nav{display:flex;align-items:center;gap:8px;padding:6px;background:#111c2b;border:1px solid var(--border);border-radius:13px;margin-top:26px;margin-bottom:8px;width:fit-content;max-width:100%;flex-wrap:wrap}
+.nav-btn{border:0;border-radius:9px;padding:11px 18px;background:transparent;color:#aebdd0;font-size:14px;font-weight:730}
+.nav-btn.active{background:linear-gradient(125deg,#e8c680,#bd9654);color:#182236;box-shadow:0 4px 15px #050a1080}
+.app-view{animation:fadeup .22s ease-out}
+@keyframes fadeup{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.raid-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:26px 26px 20px;margin:18px 0;border-radius:17px;border:1px solid #534529;background:radial-gradient(ellipse at 90% 18%,#493e34 0%,transparent 45%),linear-gradient(125deg,#1b2639,#131c2a 85%)}
+.raid-hero h2{font:normal clamp(28px,4vw,39px)/1.14 Georgia,serif;margin:5px 0 8px;letter-spacing:-.025em}
+.raid-hero p{color:#aebacc;margin:0;max-width:610px;font-size:13px}
+.raid-mark{font:normal 57px Georgia,serif;color:#d9af64;opacity:.75;line-height:1}
+.raid-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 19px}
+.raid-tab{background:#172335;color:#bdcada;border:1px solid #32435b;border-radius:9px;padding:10px 14px;font-weight:700;font-size:13px}
+.raid-tab.active{background:#2f435b;color:#f8dfa5;border-color:#ab8b56}
+.raid-pane{min-height:240px}
+.raid-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}
+.metric{border:1px solid #35435a;border-radius:14px;background:linear-gradient(160deg,#1b2a3f,#111b2a);padding:18px 19px}
+.metric .metric-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#b2bdcf;font-weight:750}
+.metric .metric-value{font-size:30px;font-weight:800;margin:4px 0 1px;font-variant-numeric:tabular-nums;color:#f2e5cb}
+.metric .metric-sub{font-size:11px;color:#9fb1c5}
+.raid-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.82fr);gap:16px}
+.raid-stack{display:grid;gap:16px}
+.raid-panel{background:rgba(18,29,45,.93);border:1px solid #2d3d54;border-radius:14px;padding:20px 20px 18px;min-width:0}
+.raid-panel h3{font:normal 22px Georgia,serif;margin:0 0 6px}
+.section-sub{color:#a6b7c9;font-size:12px;margin:0 0 17px;line-height:1.6}
+.raid-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.raid-heading h3{margin:0}
+.raid-heading small{color:#9cabbf}
+.progress-slim{height:8px;background:#344359;border-radius:15px;overflow:hidden}
+.progress-slim i{display:block;height:100%;background:linear-gradient(90deg,#947146,#f1d192);border-radius:15px;min-width:0;transition:width .25s}
+.progress-slim.cyan i{background:linear-gradient(90deg,#347f86,#8ee2e0)}
+.progress-slim.green i{background:linear-gradient(90deg,#39886e,#a0e3c0)}
+.progress-label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#b8c6d6;margin:8px 0 6px}
+.focus-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #2a3a50}
+.focus-item:last-child{border:0}
+.focus-item b{font-size:13px}
+.focus-item p{margin:2px 0 0;color:#9daec1;font-size:12px}
+.focus-item .btn{flex:none}
+.mini-code{color:#eec889;font-weight:850;letter-spacing:.03em}
+.raid-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-bottom:22px}
+.raid-card{min-width:0;background:#172438;border:1px solid #35445b;border-radius:14px;padding:16px}
+.raid-card:hover{border-color:#77734f}
+.raid-card-top{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}
+.raid-code{font-weight:850;font-size:11px;letter-spacing:.12em;color:#dec184;text-transform:uppercase}
+.raid-card h4{font-size:17px;line-height:1.25;margin:5px 0 9px;font-weight:650}
+.raid-card .raid-card-note{font-size:12px;color:#a8b5c8;margin:5px 0 12px;min-height:18px;overflow-wrap:anywhere}
+.status{font-size:10px;letter-spacing:.02em;font-weight:790;border:1px solid #586076;border-radius:20px;padding:4px 8px;background:#223247;color:#c7d3e2;white-space:nowrap}
+.status.prog{background:#243b50;color:#8adbe2;border-color:#467580}
+.status.cleared,.status.farm{background:#263d31;color:#a2e3bd;border-color:#4b8065}
+.raid-card-foot{display:flex;justify-content:space-between;gap:9px;align-items:center;margin-top:15px;flex-wrap:wrap}
+.raid-card-foot span{font-size:11px;color:#a5b6c9}
+.raid-card-buttons{display:flex;gap:6px;flex-wrap:wrap}
+.inline-note{padding:12px 14px;background:#213047;border:1px solid #364c65;border-radius:10px;color:#b9c8d8;font-size:12px;line-height:1.6;margin:13px 0}
+.raid-section-title{font:normal 24px Georgia,serif;margin:20px 0 12px;display:flex;align-items:center;gap:12px}
+.raid-section-title:after{content:'';height:1px;flex:1;background:#3d485c}
+.raid-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.raid-table-wrap{overflow:auto;border:1px solid #344359;border-radius:12px}
+.raid-table{border-collapse:collapse;width:100%;min-width:870px}
+.raid-table th{color:#abbacd;font-size:11px;text-transform:uppercase;letter-spacing:.08em;text-align:left;background:#1b2a3d;white-space:nowrap;font-weight:800}
+.raid-table td,.raid-table th{padding:11px 10px;border-bottom:1px solid #2d3d52}
+.raid-table tbody tr:last-child td{border:0}
+.raid-table td{font-size:12px;vertical-align:middle;color:#d9e2eb}
+.raid-table input,.raid-table select{border:1px solid #3b506b;color:#e9eef3;border-radius:7px;background:#101b2b;padding:8px 9px;min-width:0;width:100%}
+.raid-table input[type=checkbox]{width:19px;height:19px;accent-color:#e5c07c;vertical-align:middle;cursor:pointer}
+.raid-table input[type=number]{width:85px}
+.raid-table .slot-name{font-weight:700;min-width:105px}
+.raid-table .small-source{min-width:105px}
+.raid-table .item-name{min-width:170px}
+.raid-table .checkbox-cell{text-align:center}
+.loot-list{display:grid;gap:8px}
+.loot-row{display:flex;align-items:center;justify-content:space-between;gap:15px;background:#1a2a3d;border:1px solid #2f415a;padding:12px 14px;border-radius:9px}
+.loot-row b{font-size:13px}
+.loot-row p{color:#9eafc3;font-size:11px;margin:3px 0 0}
+.stat-hint{font-size:12px;color:#a4b4c8}
+.currency-card{padding:17px 18px;border:1px solid #34465d;border-radius:13px;background:#162438;margin:12px 0}
+.currency-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.currency-top h4{margin:0;font-size:16px}
+.currency-remove-confirm{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.currency-remove-confirm .warning{font-size:12px;font-weight:750;color:#e9b5a4}
+.currency-remove-confirm .danger{background:#67302d;border-color:#bb6d65;color:#ffebe4}
+.currency-remove-confirm .danger:hover{background:#7d3b37}
+.currency-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.currency-grid .field{margin:0}
+.currency-grid input{width:100%;background:#0e192a;border:1px solid #43546a;padding:9px;border-radius:8px;color:var(--text)}
+.currency-small{font-size:11px;color:#a3b3c6}
+.raid-modal-wide{width:min(570px,100%)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.muted-badge{color:#9fb2c8;background:#213147;border:1px solid #3a4c63;padding:5px 9px;border-radius:20px;font-size:11px}
+.reset-compact{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#afc0d0;font-size:12px}
+.reset-compact strong{color:#efce97}
+.empty-lite{color:#9cabbf;font-size:13px;padding:15px 0}
+@media(max-width:890px){.raid-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.raid-layout{grid-template-columns:1fr}.raid-card-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:630px){.raid-hero{padding:18px}.raid-hero h2{font-size:29px}.raid-mark{display:none}.raid-stats{gap:8px}.metric{padding:14px}.metric .metric-value{font-size:25px}.raid-card-grid{grid-template-columns:1fr}.raid-panel{padding:15px}.currency-grid{grid-template-columns:1fr 1fr}.field-grid{grid-template-columns:1fr}.raid-tabs{gap:5px}.raid-tab{padding:8px 10px;font-size:12px}.nav-btn{padding:9px 12px}}
+
+/* ── Raid Command Centre: focus picker and community links ────────── */
+.raid-focus-picker{border:1px solid #6c583b;border-radius:15px;background:linear-gradient(125deg,#212c3c,#172439);padding:19px 20px 16px;margin:16px 0 10px}
+.raid-focus-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.raid-focus-top h3{font:normal 23px Georgia,serif;margin:0 0 4px;color:#f4dfb5}
+.raid-focus-top p{font-size:12px;color:#b1c1d0;margin:0}
+.raid-focus-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.raid-focus-field{display:grid;gap:7px;min-width:0}
+.raid-focus-field label{font-size:11px;letter-spacing:.09em;font-weight:800;color:#dec48f;text-transform:uppercase}
+.raid-focus-field select{width:100%;min-width:0;background:#0f1c2b;border:1px solid #65718a;border-radius:9px;color:#eef2f7;font-size:14px;padding:11px 12px}
+.raid-focus-field select:focus-visible{outline:2px solid #e5bc74;outline-offset:2px}
+.raid-focus-links{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:15px;border-top:1px solid #3c4b61;padding-top:13px}
+.raid-focus-links a,.balance-resource-links a{display:inline-flex;align-items:center;gap:5px;background:#314257;border:1px solid #58677d;border-radius:8px;padding:9px 12px;color:#f4deaa;text-decoration:none;font-size:12px;font-weight:750}
+.raid-focus-links a:hover,.balance-resource-links a:hover{background:#465c74;color:#fff4d9}
+.raid-focus-links small{font-size:11px;color:#a9b9c9;flex:1;min-width:230px;line-height:1.5}
+.raid-focus-summary{margin-top:10px;font-size:12px;color:#bfd1df}
+.raid-focus-summary b{color:#f1d49c}
+.raid-other-details{border:1px solid #35465b;border-radius:12px;padding:12px 16px;margin-top:24px;background:#122034}
+.raid-other-details summary{cursor:pointer;color:#efd5a6;font-weight:750;padding:5px 0;list-style-position:inside}
+.raid-other-details summary:focus-visible{outline:2px solid #eac788;outline-offset:4px}
+.balance-resource-links{display:flex;gap:10px;flex-wrap:wrap;margin:13px 0}
+@media(max-width:680px){.raid-focus-fields{grid-template-columns:1fr}.raid-focus-picker{padding:16px}.raid-focus-top h3{font-size:21px}}
+
+/* ── Glamour Farming Atelier ─────────────────────────────────────────── */
+.glam-hero{background:radial-gradient(ellipse at 85% 0,#4e3c60 0,transparent 60%),linear-gradient(115deg,#202942,#182638);border:1px solid #6b5874;border-radius:17px;padding:23px 25px;margin-top:22px;display:flex;justify-content:space-between;align-items:center;gap:18px}
+.glam-hero h2{font:normal clamp(26px,4vw,39px) Georgia,serif;margin:5px 0 8px;color:#f4e1f3}.glam-hero h2 span{color:#edc68f}.glam-hero p{color:#bfd0da;font-size:13px;margin:0;max-width:630px;line-height:1.6}
+.glam-sigil{font-size:63px;color:#e4b8d3;opacity:.8;line-height:1}
+.glam-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0 19px}
+.glam-stat{background:#17263a;border:1px solid #34465d;border-radius:12px;padding:16px 18px}.glam-stat strong{display:block;font-size:27px;color:#f0dbaa}.glam-stat span{font-size:12px;color:#a9b9ca}
+.glam-searchbox{border:1px solid #43546c;border-radius:15px;background:#17273a;padding:19px;margin:18px 0}
+.glam-searchbox h3,.glam-heading h3{font:normal 23px Georgia,serif;color:#f3dfb4;margin:0 0 6px}
+.glam-muted{font-size:12px;color:#9eb2c5;line-height:1.65;margin:4px 0 13px}
+.glam-searchrow{display:flex;gap:9px;flex-wrap:wrap}
+.glam-searchrow input{background:#0b192a;border:1px solid #576780;border-radius:9px;color:#f8f1f0;flex:1;min-width:220px;padding:12px 13px;font:inherit;font-size:14px}
+.glam-searchrow input:focus-visible{outline:2px solid #d6b6db;outline-offset:1px}
+.glam-search-status{font-size:11px;color:#b6becd;margin:10px 0 0}
+.glam-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:13px 0 3px;max-height:430px;overflow:auto}
+.glam-result{cursor:pointer;min-width:0;text-align:left;border:1px solid #3b4e68;background:#20314a;border-radius:9px;color:#edf1f5;padding:10px 11px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.glam-result:hover,.glam-result:focus-visible{background:#334760;border-color:#a78dba;outline:none}
+.glam-manual-result{border-style:dashed;border-color:#a99ab9;background:#2a2946}.glam-manual-result:hover{background:#3a375a}
+.glam-result b{display:block;font-size:12px;overflow-wrap:anywhere}.glam-result small{display:block;color:#a8b7c9;font-size:10px;margin-top:3px}.glam-result i{font-style:normal;color:#e6c98e;font-weight:800;font-size:16px}
+.glam-preset-label{font-size:10px;color:#d1b4da;letter-spacing:.07em;text-transform:uppercase;font-weight:800;margin:14px 0 7px}
+.glam-quick{display:flex;gap:7px;flex-wrap:wrap}.glam-quick button{border-radius:15px;border:1px solid #57677a;background:#24334a;padding:7px 11px;color:#e0e7ee;font-size:11px;cursor:pointer}.glam-quick button:hover{border-color:#bca1d1;color:white}
+.glam-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:22px 0 12px}.glam-heading h3{margin:0}.glam-select{background:#152439;color:#e5edf4;padding:9px 10px;border:1px solid #52637a;border-radius:8px}
+.glam-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.glam-card{background:linear-gradient(147deg,#23314a,#152436);border:1px solid #43546b;border-radius:14px;padding:18px;min-width:0}
+.glam-card.glam-obtained{border-color:#568d75;background:linear-gradient(150deg,#1e383a,#172a35)}
+.glam-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.glam-card h4{font-size:17px;color:#f0e3dc;margin:8px 0 4px;overflow-wrap:anywhere}
+.glam-badges{display:flex;gap:5px;flex-wrap:wrap}.glam-badge{border:1px solid #647186;background:#293953;border-radius:20px;padding:3px 8px;color:#dec4eb;font-size:10px;font-weight:750}.glam-badge.green{border-color:#698c77;color:#b8efcd;background:#213d34}.glam-badge.gold{border-color:#806e4d;color:#ead6a9}
+.glam-check{display:inline-flex;align-items:center;gap:6px;color:#cce8dc;font-size:11px;cursor:pointer;white-space:nowrap;font-weight:750}.glam-check input{accent-color:#a7d5bb;width:16px;height:16px}
+.glam-card .glam-source{color:#bdc9d8;font-size:12px;line-height:1.6;min-height:20px;margin-top:8px}
+.glam-card .glam-source strong{color:#ead9ae}
+.glam-item-label{color:#a9a6cc;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;margin-top:11px}
+.glam-steps-list{list-style:disc;padding-left:17px;margin:0}.glam-steps-list li{padding-left:3px;margin:8px 0;color:#e9c78a}
+.glam-steps-list .glam-step{margin:0;color:#e1e8ee}
+.glam-steps-list .glam-step input{margin-top:3px}
+.glam-live-hint{font-size:11px;color:#b4c5d8;line-height:1.7;margin:11px 0 0}
+.glam-live-hint a,.glam-live-hint button{color:#edd2a4}
+.glam-live-hint button{font:inherit;background:transparent;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.glam-live-hint button:disabled{opacity:.6;cursor:wait}
+.glam-instructions{margin:13px 0 11px;padding:12px;border-radius:10px;background:#111e2f;border:1px solid #35475c}
+.glam-instructions-title{font-size:10px;color:#e9c88e;letter-spacing:.11em;text-transform:uppercase;font-weight:850;margin-bottom:9px}
+.glam-step{display:flex;align-items:flex-start;gap:9px;margin:9px 0;color:#e1e8ee;font-size:12px;line-height:1.5;cursor:pointer}.glam-step input{flex:none;margin-top:3px;accent-color:#8ac1ac}.glam-step.is-done span{text-decoration:line-through;color:#94afa6}
+.glam-cardfoot{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:12px}.glam-cardfoot a{color:#efcf9b;text-decoration:none;font-size:11px;padding:7px 9px;border:1px solid #4c5e75;background:#253448;border-radius:7px}.glam-cardfoot a:hover{color:#fff2d8}.glam-cardfoot .btn{padding:7px 9px}
+.glam-editbox{border-top:1px solid #46566a;margin-top:15px;padding-top:14px;display:grid;gap:9px}
+.glam-editbox label{font-size:11px;color:#d3c0d6;font-weight:750}.glam-editbox input,.glam-editbox textarea,.glam-editbox select{width:100%;background:#0e1b2b;border:1px solid #627087;border-radius:8px;padding:9px;color:#f1f3f5;font:inherit;font-size:12px}.glam-editbox textarea{min-height:85px;resize:vertical}
+.glam-edit-actions{display:flex;gap:8px;flex-wrap:wrap}
+.glam-alert{color:#e7c19c;font-size:11px;margin-top:10px;line-height:1.55}
+.glam-source-preview{border:1px solid #91754b;background:#273246;border-radius:10px;padding:13px;margin:12px 0;color:#f1e3cd}
+.glam-source-preview strong{color:#f6d3a0}.glam-source-preview ol{margin:9px 0 12px;padding-left:19px;font-size:12px;line-height:1.6}.glam-source-preview li{margin:4px 0}.glam-source-preview .glam-edit-actions{margin-top:10px}
+.glam-cardfoot button:disabled{opacity:.65;cursor:wait}
+.glam-lookup-note{font-size:11px;color:#a8b6c6;margin:10px 0 0;line-height:1.55}.glam-cardfoot a{display:inline-flex;align-items:center;gap:4px}.glam-cardfoot a:focus-visible{outline:2px solid #eed6a8;outline-offset:2px}
+.glam-empty{padding:33px 25px;text-align:center;border:1px dashed #66758d;border-radius:13px;color:#afc0d0;background:#17263a}.glam-empty strong{display:block;font:normal 22px Georgia,serif;margin-bottom:8px;color:#f0d4bc}
+@media(max-width:840px){.glam-board{grid-template-columns:1fr}.glam-results{grid-template-columns:1fr}}
+@media(max-width:530px){.glam-hero{padding:18px}.glam-sigil{display:none}.glam-stats{gap:7px}.glam-stat{padding:11px}.glam-stat strong{font-size:22px}.glam-searchbox{padding:14px}}
+
+/* Customisable visual themes (v6): all panels share the same FFXIV-inspired layout. */
+:root[data-theme="dark"]{--theme-glow:#22304a;--theme-base:#0b111e;--theme-base2:#131b2c;--theme-base3:#0b1019;--theme-card:#17263a;--theme-card2:#1b2c42;--theme-field:#101c2d;--theme-edge:#394c67;--theme-tint:#27394b;--theme-hint:#aebdd0;--theme-contrast:#14243a;--theme-hero:#263149;--theme-heading:#f3eedf}
+:root[data-theme="lilac"]{--bg:#171329;--surface:#211a36;--surface2:#2f2446;--border:#6f5f93;--text:#f7f1ff;--muted:#c5b8de;--gold:#d9b8ff;--gold2:#aa7fe7;--cyan:#c9baff;--success:#b2e4c7;--theme-glow:#54407b;--theme-base:#171123;--theme-base2:#261c3e;--theme-base3:#150e21;--theme-card:#251d3a;--theme-card2:#312747;--theme-field:#1c1830;--theme-edge:#756594;--theme-tint:#433358;--theme-hint:#cfbfe9;--theme-contrast:#21152f;--theme-hero:#3b2d56;--theme-heading:#f7ebff;color-scheme:dark}
+:root[data-theme="pink"]{--bg:#1b1020;--surface:#26172e;--surface2:#34233b;--border:#68446f;--text:#fff1f8;--muted:#d3b7d1;--gold:#ffb8de;--gold2:#ba6b9d;--cyan:#ffc0f0;--success:#a8dfbd;--theme-glow:#64305b;--theme-base:#180f20;--theme-base2:#2b1731;--theme-base3:#180e1d;--theme-card:#2b2038;--theme-card2:#3b2947;--theme-field:#24172f;--theme-edge:#795786;--theme-tint:#50324d;--theme-hint:#dcc2dc;--theme-contrast:#2d132e;--theme-hero:#452940;--theme-heading:#ffe2f3;color-scheme:dark}
+:root[data-theme="blue"]{--bg:#0c1c2c;--surface:#122b40;--surface2:#19374d;--border:#3c6482;--text:#eaf7ff;--muted:#b3cee1;--gold:#94d8ff;--gold2:#4e97c4;--cyan:#8fe5ee;--success:#a7e0cb;--theme-glow:#24547b;--theme-base:#0a1a2b;--theme-base2:#152d43;--theme-base3:#0c1829;--theme-card:#183249;--theme-card2:#24455d;--theme-field:#11263d;--theme-edge:#4c7593;--theme-tint:#25415a;--theme-hint:#b6d5e9;--theme-contrast:#0b263b;--theme-hero:#1b405d;--theme-heading:#e2f3ff;color-scheme:dark}
+:root[data-theme="green"]{--bg:#10201c;--surface:#183129;--surface2:#203e34;--border:#4b7662;--text:#f0fff3;--muted:#bad6c6;--gold:#9ee4ae;--gold2:#599c72;--cyan:#a2e9d2;--success:#a7e1b6;--theme-glow:#2c5940;--theme-base:#101f1a;--theme-base2:#1b3228;--theme-base3:#111e19;--theme-card:#20382c;--theme-card2:#2b4b39;--theme-field:#162d24;--theme-edge:#5b816a;--theme-tint:#2d4d39;--theme-hint:#c4e1cf;--theme-contrast:#10301e;--theme-hero:#2b4b35;--theme-heading:#e7ffe6;color-scheme:dark}
+:root[data-theme="yellow"]{--bg:#241c12;--surface:#302617;--surface2:#403220;--border:#826b42;--text:#fff8e6;--muted:#dccba9;--gold:#ffe18a;--gold2:#bf9f4e;--cyan:#f5dda5;--success:#bfe2a4;--theme-glow:#674b25;--theme-base:#221a12;--theme-base2:#382a19;--theme-base3:#22190f;--theme-card:#382d1c;--theme-card2:#493822;--theme-field:#2d2417;--theme-edge:#937448;--theme-tint:#534222;--theme-hint:#ead4af;--theme-contrast:#372808;--theme-hero:#4b3c24;--theme-heading:#fff4d2;color-scheme:dark}
+:root[data-theme="light"]{--bg:#f7f5f1;--surface:#ffffff;--surface2:#f5f0e9;--border:#d3c8ba;--text:#2b2b3b;--muted:#606779;--gold:#926232;--gold2:#b28344;--cyan:#226a85;--success:#398261;--red:#b04450;--shadow:0 13px 28px rgba(67,54,40,.08);--theme-glow:#ede0cc;--theme-base:#faf9f6;--theme-base2:#f1ece5;--theme-base3:#f7f5f1;--theme-card:#ffffff;--theme-card2:#f5f0e9;--theme-field:#ffffff;--theme-edge:#c7b9a9;--theme-tint:#eae1d4;--theme-hint:#545d6e;--theme-contrast:#ffffff;--theme-hero:#fff5e5;--theme-heading:#29283a;color-scheme:light}
+body{background:radial-gradient(circle at 80% 0%,var(--theme-glow) 0%,transparent 40%),linear-gradient(155deg,var(--theme-base),var(--theme-base2) 65%,var(--theme-base3));}
+/* Shared component surfaces and hues. */
+.app-nav,.adv-board,.raid-panel,.raid-other-details,.glam-searchbox,.glam-stat,.glam-empty,.currency-card,.modal,.glam-instructions,.adv-category,.adv-checkbox,.adv-toggle,.glam-editbox,.glam-badge{background:var(--theme-card);border-color:var(--theme-edge);color:var(--text)}
+.adv-tile,.stat,.metric,.raid-card,.glam-card{background:linear-gradient(145deg,var(--theme-card2),var(--theme-card));border-color:var(--theme-edge);color:var(--text)}
+.adv-tile.adv-complete,.glam-card.glam-obtained{background:linear-gradient(145deg,var(--theme-card2),var(--theme-card));border-color:var(--success)}
+.adv-checkgrid .adv-checkbox.is-checked{background:var(--theme-tint);border-color:var(--success)}
+.adv-glyph,.adv-chip,.adv-badge,.muted-badge,.glam-quick button,.glam-cardfoot a,.glam-result,.glam-result.glam-manual-result,.glam-badge,.glam-select{background:var(--theme-tint);border-color:var(--theme-edge);color:var(--text)}
+.adv-route,.adv-time-settings,.raid-focus-picker,.raid-hero,.glam-hero,.inline-note{background:linear-gradient(125deg,var(--theme-hero),var(--theme-card));border-color:var(--theme-edge);color:var(--text)}
+.raid-hero{background:radial-gradient(ellipse at 90% 18%,var(--theme-glow),transparent 48%),linear-gradient(125deg,var(--theme-hero),var(--theme-card))}
+.glam-hero{background:radial-gradient(ellipse at 90% 18%,var(--theme-glow),transparent 48%),linear-gradient(125deg,var(--theme-hero),var(--theme-card))}
+.btn,.raid-tab,.loot-row,.task,.personal-task-group .task{background:var(--theme-card2);border-color:var(--theme-edge);color:var(--text)}
+.btn:hover,.raid-tab:hover,.glam-quick button:hover,.glam-result:hover,.task:hover{background:var(--theme-tint);border-color:var(--gold)}
+.btn.primary,.nav-btn.active,.raid-tab.active,.pill.active{background:linear-gradient(125deg,var(--gold),var(--gold2));border-color:var(--gold);color:var(--theme-contrast)}
+.btn.primary:hover{background:var(--gold)}
+.nav-btn{color:var(--theme-hint)}
+.adv-select,.adv-input,.field input,.field textarea,.field select,.raid-focus-field select,.raid-table input,.raid-table select,.currency-grid input,.glam-editbox input,.glam-editbox select,.glam-editbox textarea,.glam-searchrow input,#search{background:var(--theme-field);border-color:var(--theme-edge);color:var(--text)}
+.adv-section-title:after,.raid-section-title:after{background:var(--theme-edge)}
+.adv-tile-header p,.adv-tile .adv-small,.adv-small,.adv-subnote,.adv-inline label,.adv-checkbox,.adv-header p,.adv-stage,.adv-time-settings p,.raid-hero p,.raid-focus-top p,.raid-focus-summary,.section-sub,.raid-card .raid-card-note,.glam-hero p,.glam-muted,.glam-stat span,.glam-search-status,.glam-live-hint,.glam-lookup-note,.glam-result small,.glam-card .glam-source,.glam-item-label,.glam-empty,.glam-alert,.stat-hint,.inline-note,.adv-empty,.raid-focus-links small{color:var(--muted)}
+.adv-count,.adv-theme-settings h3,.adv-section-button,.adv-time-settings h3,.glam-searchbox h3,.glam-heading h3,.glam-card h4,.raid-focus-top h3,.raid-panel h3,.raid-hero h2,.glam-hero h2,.glam-stat strong,.metric .metric-value,.raid-code,.raid-other-details summary,.adv-route strong,.mini-code{color:var(--theme-heading)}
+.adv-route a,.adv-tile a,.bottom a,.glam-live-hint a,.glam-cardfoot a,.raid-focus-links a,.balance-resource-links a{color:var(--gold)}
+.raid-focus-links a,.balance-resource-links a{background:var(--theme-tint);border-color:var(--theme-edge)}
+.raid-table th{background:var(--theme-card2);color:var(--muted)}
+.raid-table td{color:var(--text);border-color:var(--theme-edge)}
+.progress,.progress-slim{background:var(--theme-tint)}
+.progress>div,.progress-slim i{background:linear-gradient(90deg,var(--gold2),var(--gold))}
+.adv-expand,.adv-section-button{border-color:var(--theme-edge);color:var(--gold)}
+input[type="checkbox"]{accent-color:var(--gold)}
+/* Brighter text/controls are necessary for true light-mode readability. */
+:root[data-theme="light"] .raid-focus-summary b,:root[data-theme="light"] .raid-card-foot strong,:root[data-theme="light"] .metric .metric-label,:root[data-theme="light"] .metric .metric-sub,:root[data-theme="light"] .focus-item p,:root[data-theme="light"] .focus-item b,:root[data-theme="light"] .progress-label,:root[data-theme="light"] .raid-card-foot span,:root[data-theme="light"] .raid-heading small,:root[data-theme="light"] .adv-tile-header h3,:root[data-theme="light"] .adv-category-name,:root[data-theme="light"] .glam-card .glam-source strong,:root[data-theme="light"] .glam-check,:root[data-theme="light"] .glam-result b,:root[data-theme="light"] .glam-quick button,:root[data-theme="light"] .raid-focus-field label,:root[data-theme="light"] .adv-time-settings label,:root[data-theme="light"] .field label,:root[data-theme="light"] .glam-editbox label,:root[data-theme="light"] .glam-badge,:root[data-theme="light"] .glam-preset-label{color:var(--text)}
+:root[data-theme="light"] .glam-hero h2 span,:root[data-theme="light"] .raid-hero h2 span,:root[data-theme="light"] .glam-sigil{color:var(--gold)!important}
+:root[data-theme="light"] .adv-checkbox.is-checked,:root[data-theme="light"] .adv-tile.adv-complete{background:#e8f4e9}
+:root[data-theme="light"] .task input[type=checkbox]{background:#fff;border-color:#87766b}
+:root[data-theme="light"] .task input[type=checkbox]:checked{background:var(--success)}
+:root[data-theme="light"] .task input[type=checkbox]:checked:after{color:#fff}
+:root[data-theme="light"] .glam-badge.green{background:#e3f2e7;color:#226449}
+:root[data-theme="light"] .glam-badge.gold{color:#624519}
+:root[data-theme="light"] .status{background:#f0eee9;color:#444b57}
+:root[data-theme="light"] .status.prog{background:#e4f2f9;color:#25556a}
+:root[data-theme="light"] .status.cleared,:root[data-theme="light"] .status.farm{background:#e2f2e7;color:#275c3e}
+/* New theme controls and sectional collapse switches. */
+.adv-theme-settings{background:linear-gradient(125deg,var(--theme-hero),var(--theme-card));border:1px solid var(--theme-edge);border-radius:13px;padding:18px;margin:18px 0 14px}
+.adv-theme-settings h3{margin:0 0 7px;font:normal 22px Georgia,serif}
+.adv-theme-settings .adv-small{margin:0 0 15px}
+.adv-theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.adv-theme-option{display:flex;align-items:center;gap:11px;text-align:left;border:1px solid var(--theme-edge);background:var(--theme-card);color:var(--text);border-radius:11px;padding:10px;min-width:0}
+.adv-theme-option:hover{border-color:var(--gold);background:var(--theme-card2)}
+.adv-theme-option.active{border:2px solid var(--gold);padding:9px;box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 14%,transparent)}
+.adv-theme-name{font-weight:750;font-size:13px}
+.adv-theme-current{font-size:11px;color:var(--gold);margin-left:auto}
+.adv-theme-swatch{display:flex;gap:4px;align-items:end;justify-content:center;width:52px;height:38px;border-radius:8px;padding:7px;background:#20283b;border:1px solid #667;flex:none}
+.adv-theme-swatch span{height:21px;width:19px;border-radius:4px;background:#d4ba80}.adv-theme-swatch i{height:14px;width:12px;border-radius:3px;background:#4f6678}
+.adv-theme-swatch.theme-lilac{background:#30243f}.adv-theme-swatch.theme-lilac span{background:#d9b8ff}.adv-theme-swatch.theme-lilac i{background:#9670c6}
+.adv-theme-swatch.theme-pink{background:#312037}.adv-theme-swatch.theme-pink span{background:#ffb8de}.adv-theme-swatch.theme-pink i{background:#8a517e}
+.adv-theme-swatch.theme-blue{background:#15314b}.adv-theme-swatch.theme-blue span{background:#94d8ff}.adv-theme-swatch.theme-blue i{background:#477999}
+.adv-theme-swatch.theme-green{background:#1a392e}.adv-theme-swatch.theme-green span{background:#a3e4ad}.adv-theme-swatch.theme-green i{background:#4b886c}
+.adv-theme-swatch.theme-yellow{background:#3b2e1b}.adv-theme-swatch.theme-yellow span{background:#ffe18a}.adv-theme-swatch.theme-yellow i{background:#a18a55}
+.adv-theme-swatch.theme-light{background:#faf9f6}.adv-theme-swatch.theme-light span{background:#d0a16b}.adv-theme-swatch.theme-light i{background:#ddd6c9}
+.adv-section-toggle{align-items:center}
+.adv-section-toggle h3{font:inherit;margin:0;flex:none}
+.adv-section-button{border:1px solid var(--theme-edge);background:var(--theme-card2);border-radius:9px;width:38px;height:34px;flex:none;font-size:20px;font-weight:800;line-height:1;cursor:pointer}
+.adv-section-button:hover{background:var(--theme-tint)}
+.adv-grid[hidden]{display:none!important}
+@media(max-width:700px){.adv-theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.adv-theme-option{gap:7px}.adv-theme-current{font-size:10px}}
+@media(max-width:420px){.adv-theme-grid{grid-template-columns:1fr 1fr}.adv-theme-option{flex-wrap:wrap}}
+
+
+/* Glam Hunting: two ownership sections, source hints and precise search results. */
+.glam-board{display:block}
+.glam-group{margin:14px 0 28px}
+.glam-group-title{display:flex;align-items:center;gap:11px;flex-wrap:wrap;padding:2px 0 13px;border-bottom:1px solid var(--theme-edge);margin-bottom:15px}
+.glam-group-title h4{margin:0;font:normal 24px Georgia,serif;color:var(--theme-heading)}
+.glam-group-count{font-size:11px;color:var(--muted);border:1px solid var(--theme-edge);border-radius:20px;padding:4px 10px}
+.glam-group-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.glam-group-board>.glam-empty{grid-column:1/-1;padding:24px}
+.glam-group-board>.glam-empty strong{font-size:16px;margin:0}
+.glam-source-tag{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:11px;line-height:1.45;color:var(--text);background:var(--theme-tint);border:1px solid var(--theme-edge);border-radius:16px;padding:4px 9px;font-weight:650}
+.glam-source-tag.unknown{font-weight:450;color:var(--muted);border-style:dashed}
+.glam-source-tag em{font-size:10px;color:var(--muted);font-style:normal;font-weight:400}
+.glam-card-source{margin:10px 0 5px}
+.glam-result-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px}
+.glam-result-meta small{margin:0}
+@media(max-width:840px){.glam-group-board{grid-template-columns:1fr}}
+</style>
+<script>
+try { const saved=JSON.parse(localStorage.getItem('eorzea-adventurer-v3')||'{}').theme; if(['dark','pink','blue','green','yellow','light','lilac'].includes(saved))document.documentElement.dataset.theme=saved; }catch(e){}
+</script>
+</head>
+<body>
+<main class="container">
+  <div class="topline">
+    <div><div class="eyebrow">A little adventurer's organizer</div><h1>Eorzea <span>Checklist</span></h1><p class="subtitle">FFXIV All in One Tracker</p></div>
+    <div class="actions">
+      <button class="btn" id="configBtn" data-main-view="config" type="button" aria-pressed="false">⚙ Config</button>
+      <button class="btn" id="exportBtn" type="button" title="Download your tasks as a JSON file">↧ Backup</button>
+      <button class="btn" id="importBtn" type="button" title="Restore tasks from a backup">↥ Restore</button>
+      <button class="btn primary" id="addBtn" type="button">＋ New task</button>
+    </div>
+  </div>
+  <nav class="app-nav" aria-label="Main navigation">
+    <button class="nav-btn active" data-main-view="checklist" type="button" aria-pressed="true">✧ To Do List</button>
+    <button class="nav-btn" data-main-view="endgame" type="button" aria-pressed="false">⚔ Raid Tracker</button>
+    <button class="nav-btn" data-main-view="glam" type="button" aria-pressed="false">✂ Glamour</button>
+  </nav>
+  <div id="checklistView" class="app-view">
+  <div class="stats">
+    <article class="stat"><div class="heading">Today's progress</div><div class="value" id="dailyProgress">0 / 0</div><div class="note">Daily reset in <strong id="dailyCountdown">—</strong></div><div class="progress"><div id="dailyBar"></div></div></article>
+    <article class="stat"><div class="heading">This week's progress</div><div class="value" id="weeklyProgress">0 / 0</div><div class="note">Weekly reset in <strong id="weeklyCountdown">—</strong></div><div class="progress"><div id="weeklyBar"></div></div></article>
+    <article class="stat"><div class="heading">Adventurer goals</div><div class="value" id="goalProgress">0 / 0</div><div class="note">No timer. Just your own pace.</div><div class="progress"><div id="goalBar"></div></div></article>
+  </div>
+    <div id="adventurerBoard"></div>
+  </div><!-- /checklistView -->
+  <div id="configView" class="app-view hidden"><div id="adventurerConfig"></div></div>
+  <div id="endgameView" class="app-view hidden">
+    <section class="raid-hero">
+      <div><div class="eyebrow" id="raidHeroEyebrow">Dawntrail · Patch 7.57</div><h2>The <span style="color:#e8c783">Raid Tracker</span></h2>
+      <p>Savage, Ultimates, gear, loot and tomestones — tracked your way. Every number is editable, and nothing connects to your in-game character.</p></div>
+      <div class="raid-mark" aria-hidden="true">✥</div>
+    </section>
+    <section class="raid-focus-picker" aria-label="Raid progression configuration">
+      <div class="raid-focus-top"><div><h3>⚔ Your current progression</h3><p>Choose an expansion, raid tier and main job. Your older progress stays saved.</p></div><span class="muted-badge">Personal raid profile</span></div>
+      <div class="raid-focus-fields">
+        <div class="raid-focus-field"><label for="raidExpansion">Expansion</label><select id="raidExpansion"></select></div>
+        <div class="raid-focus-field"><label for="raidTier">Savage tier / Ultimate</label><select id="raidTier"></select></div>
+        <div class="raid-focus-field"><label for="raidMainJob">Main job</label><select id="raidMainJob"></select></div>
+      </div>
+      <div class="raid-focus-summary" id="raidFocusSummary" aria-live="polite"></div>
+      <div class="raid-focus-links" id="raidBalanceLinks" aria-label="The Balance community job and gearing guides"></div>
+    </section>
+    <div class="raid-tabs" role="tablist" aria-label="Endgame sections">
+      <button class="raid-tab active" data-raid-tab="overview" role="tab" aria-selected="true">Overview</button>
+      <button class="raid-tab" data-raid-tab="encounters" role="tab" aria-selected="false">Encounters</button>
+      <button class="raid-tab" data-raid-tab="gear" role="tab" aria-selected="false">Gear planner</button>
+      <button class="raid-tab" data-raid-tab="currencies" role="tab" aria-selected="false">Currencies</button>
+      <button class="raid-tab" data-raid-tab="loot" role="tab" aria-selected="false">Loot journal</button>
+    </div>
+    <div class="raid-pane" id="raidContent" role="tabpanel" aria-live="polite"></div>
+    <div class="inline-note">⚙ This is a manual, offline tracker. Its weekly Savage checkboxes are personal farming goals — <b>not</b> loot-lockout indicators. Current Heavyweight Savage loot restrictions were lifted in patch 7.56. Ultimate reward eligibility may still be weekly. <a style="color:#f0ce8e" href="https://na.finalfantasyxiv.com/lodestone/topics/detail/c46881a31a2c90d0965493c921b434eca09113f8" target="_blank" rel="noopener">Ultimate patch notes ↗</a></div>
+  </div><!-- /endgameView -->
+  <div id="glamView" class="app-view hidden" aria-label="Glamour farming tracker">
+    <section class="glam-hero"><div><div class="eyebrow">The glamour atelier</div><h2>Glam <span>Hunting</span></h2><p>Search for pieces, save them to your wardrobe, and mark them collected. Open Lodestone or Garland Tools for the item details.</p></div><div class="glam-sigil" aria-hidden="true">✦</div></section>
+    <div id="glamStats" class="glam-stats"></div>
+    <section class="glam-searchbox" aria-label="Find glamour pieces"><h3>Find a glamour piece</h3><p class="glam-muted">Search FFXIV item names using word-start matching in any order. For example, <b>Yuweyawata aiming</b> matches pieces with both words, but <b>aiming</b> will not match <b>maiming</b>. Live results come from XIVAPI.</p>
+      <div class="glam-searchrow"><input id="glamSearch" type="search" maxlength="110" autocomplete="off" placeholder="Try Yuweyawata aiming, Edenmorn, Calfskin..." aria-label="Glamour item name"><button id="glamSearchBtn" class="btn primary" type="button">Search items</button><button id="glamAddTyped" class="btn" type="button" title="Add the exact name typed above, including items not found in the catalogue">＋ Add typed name</button></div>
+      <div class="glam-search-status" id="glamSearchStatus" role="status">Search for item names. Keywords must match the beginning of a word, so Aiming will not match Maiming.</div><div id="glamResults" class="glam-results" aria-label="Item results"></div>
+    </section>
+    <div class="glam-heading"><h3>Your wardrobe ✨</h3></div>
+    <section id="glamBoard" class="glam-board" aria-live="polite"></section>
+    <p class="glam-muted" style="margin:17px 0 25px">Quick source labels identify known item sets, not every possible acquisition route. Check Lodestone or Garland Tools for full details. Your collection and personal notes stay saved in this browser.</p>
+  </div><!-- /glamView -->
+  <div class="bottom"><span id="resetNote">Resets use FFXIV's global clock, displayed in your local timezone.</span><span>Saved to this browser only · <a href="https://ffxiv.consolegameswiki.com/wiki/Reset" target="_blank" rel="noopener">Reset details</a></span></div>
+</main>
+<div class="modal-backdrop hidden" id="editorBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorHeading">
+    <h2 id="editorHeading">New task</h2>
+    <form id="editorForm">
+      <div class="field"><label for="taskName">Task name</label><input id="taskName" maxlength="130" required placeholder="e.g. Complete Wondrous Tails"></div>
+      <div class="field"><label for="taskFrequency">Repeats</label><select id="taskFrequency"><option value="daily">Every day (15:00 UTC)</option><option value="weekly">Every week (Tue 08:00 UTC)</option><option value="goal">One-time goal (never resets)</option></select></div>
+      <div class="field"><label for="taskCategory">Category</label><input id="taskCategory" maxlength="45" placeholder="e.g. Raiding, Glamour, Crafting" list="categories"><datalist id="categories"><option value="Duties"><option value="Tribes"><option value="Gold Saucer"><option value="Raiding"><option value="Crafting & Gathering"><option value="Progression"><option value="Other"></datalist></div>
+      <div class="field"><label for="taskNotes">Notes (optional)</label><textarea id="taskNotes" maxlength="500" placeholder="Anything you want to remember…"></textarea></div>
+      <div class="modal-actions"><button class="btn ghost" type="button" id="cancelBtn">Cancel</button><button class="btn primary" type="submit" id="saveBtn">Save task</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="raidEditorBackdrop">
+  <div class="modal raid-modal-wide" role="dialog" aria-modal="true" aria-labelledby="raidEditorHeading">
+    <h2 id="raidEditorHeading">Encounter progress</h2>
+    <form id="raidEditorForm">
+      <div class="field"><label for="raidEditorName">Encounter</label><input id="raidEditorName" maxlength="110" required></div>
+      <div class="field-grid">
+        <div class="field"><label for="raidEditorGroup">Category</label><select id="raidEditorGroup"><option value="savage">Savage / Coil</option><option value="ultimate">Ultimate</option><option value="extreme">Extreme / Unreal</option><option value="other">Other endgame</option></select></div>
+        <div class="field"><label for="raidEditorExpansion">Expansion</label><select id="raidEditorExpansion"></select></div>
+        <div class="field"><label for="raidEditorTier">Raid tier</label><select id="raidEditorTier"></select></div>
+        <div class="field"><label for="raidEditorCode">Short label</label><input id="raidEditorCode" maxlength="16" placeholder="e.g. M9S"></div>
+        <div class="field"><label for="raidEditorStatus">Progress status</label><select id="raidEditorStatus"><option value="not-started">Not started</option><option value="learning">Learning</option><option value="prog">Progging</option><option value="cleared">Cleared</option><option value="farm">Farming</option></select></div>
+        <div class="field"><label for="raidEditorBest">Fight progress reached (0–100%)</label><input id="raidEditorBest" type="number" min="0" max="100" step="1"></div>
+        <div class="field"><label for="raidEditorTotal">Lifetime clears</label><input id="raidEditorTotal" type="number" min="0" max="999999" step="1"></div>
+        <div class="field"><label for="raidEditorPhase">Current phase / mechanic</label><input id="raidEditorPhase" maxlength="100" placeholder="e.g. P3 intermission"></div>
+      </div>
+      <div class="field"><label for="raidEditorNotes">Personal notes / strategy / next focus</label><textarea id="raidEditorNotes" maxlength="800" placeholder="What do you want to practise next?"></textarea></div>
+      <div class="modal-actions"><button class="btn" id="raidEditorCancel" type="button">Cancel</button><div class="raid-actions"><button class="btn ghost hidden" id="raidEditorDelete" type="button">Delete</button><button class="btn primary" type="submit">Save encounter</button></div></div>
+    </form>
+  </div>
+</div>
+<div class="modal-backdrop hidden" id="lootEditorBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lootEditorHeading">
+    <h2 id="lootEditorHeading">Record loot</h2>
+    <form id="lootEditorForm">
+      <div class="field"><label for="lootEncounter">Encounter</label><select id="lootEncounter"></select></div>
+      <div class="field"><label for="lootItem">Item / reward</label><input id="lootItem" required maxlength="120" placeholder="e.g. Savage weapon coffer"></div>
+      <div class="field-grid"><div class="field"><label for="lootQuantity">Quantity</label><input id="lootQuantity" type="number" min="1" max="999" value="1"></div><div class="field"><label for="lootDate">Date</label><input id="lootDate" type="date" required></div></div>
+      <div class="field"><label for="lootNotes">Notes (optional)</label><input id="lootNotes" maxlength="150" placeholder="e.g. WAR mainhand"></div>
+      <div class="modal-actions"><button class="btn" type="button" id="lootCancel">Cancel</button><button class="btn primary" type="submit">Save loot</button></div>
+    </form>
+  </div>
+</div>
+<input class="hidden" id="fileInput" type="file" accept="application/json,.json">
+<div id="toast" class="toast hidden" role="status"></div>
+<script>
+/* Shared display clock. The game's UTC reset instants never move with this setting. */
+window.EorzeaClock = (()=>{
+ const key='eorzea-adventurer-v3';
+ const valid=zone=>{if(typeof zone!=='string'||zone.length>80)return false;try{new Intl.DateTimeFormat('en',{timeZone:zone});return true}catch{return false}};
+ const selected=()=>{try{const z=JSON.parse(localStorage.getItem(key)||'{}').timeZone;return valid(z)?z:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC')}catch{return Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'}};
+ const format=(instant,opts={})=>new Intl.DateTimeFormat(undefined,{timeZone:selected(),...opts}).format(new Date(instant));
+ const zoneName=()=>selected().replaceAll('_',' ');
+ return {selected,format,zoneName,valid};
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const KEY = 'eorzea-checklist-v1';
+  const DAY_MS = 86400000;
+  const WEEK_MS = DAY_MS * 7;
+  const starter = [
+    {title:'Duty Roulette: Leveling', frequency:'daily', category:'Duties', notes:'Level a job and earn rewards.'},
+    {title:'Duty Roulette: Expert', frequency:'daily', category:'Duties', notes:'When unlocked — earn tomestones.'},
+    {title:'Frontline Roulette', frequency:'daily', category:'Duties', notes:'PvP rewards and series progress.'},
+    {title:'Allied Society quests', frequency:'daily', category:'Tribes', notes:'Spend up to 12 shared daily allowances.'},
+    {title:'Mini Cactpot', frequency:'daily', category:'Gold Saucer', notes:'Three tickets a day.'},
+    {title:'Wondrous Tails', frequency:'weekly', category:'Progression', notes:'Remember your journal expires separately.'},
+    {title:'Custom Deliveries', frequency:'weekly', category:'Crafting & Gathering', notes:'Spend weekly allowances.'},
+    {title:'Weekly capped tomestones', frequency:'weekly', category:'Duties', notes:'Track your cap in-game.'},
+    {title:'Challenge Log', frequency:'weekly', category:'Progression', notes:'Pick the rewards you actually want.'},
+    {title:'Clear the next raid or trial', frequency:'goal', category:'Raiding', notes:'Edit this to your current goal.'}
+  ];
+  const el = id => document.getElementById(id);
+  const uuid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+  function validTask(t) {
+    return t && typeof t.title === 'string' && t.title.trim().length > 0 && t.title.length <= 130 && ['daily','weekly','goal'].includes(t.frequency);
+  }
+  function normalize(t) {
+    return {id:typeof t.id === 'string' && t.id ? t.id : uuid(),title:t.title.trim(),frequency:t.frequency,category:typeof t.category === 'string' ? t.category.slice(0,45).trim():'',notes:typeof t.notes === 'string' ? t.notes.slice(0,500):'',doneCycle:typeof t.doneCycle === 'string'?t.doneCycle:'',done: t.done === true};
+  }
+  function load() {
+    try {const raw = localStorage.getItem(KEY);if(raw!==null){const data=JSON.parse(raw);if(Array.isArray(data))return data.filter(validTask).map(normalize)}} catch(e){console.warn('Could not read saved tasks:',e)}
+    return [];
+  }
+  let tasks=load(), filter='all', query='', editingId=null;
+  function persist(){try{localStorage.setItem(KEY,JSON.stringify(tasks));return true}catch(e){toast('Unable to save in this browser. Use Backup to preserve your tasks.');return false}}
+  // The most recent reset instant, calculated from UTC. Handles daylight savings automatically.
+  function cycleStart(frequency, now=Date.now()){
+    const d=new Date(now), y=d.getUTCFullYear(),m=d.getUTCMonth(),date=d.getUTCDate();
+    if(frequency==='daily'){
+      let at=Date.UTC(y,m,date,15);if(at>now)at-=DAY_MS;return at;
+    }
+    if(frequency==='weekly'){
+      const sinceTuesday=(d.getUTCDay()-2+7)%7;
+      let at=Date.UTC(y,m,date-sinceTuesday,8);if(at>now)at-=WEEK_MS;return at;
+    }
+    return null;
+  }
+  function cycleId(frequency,now=Date.now()){const at=cycleStart(frequency,now);return at===null?'':new Date(at).toISOString()}
+  function complete(t){return t.frequency==='goal'?t.done:t.doneCycle===cycleId(t.frequency)}
+  function nextReset(frequency){return cycleStart(frequency)+(frequency==='daily'?DAY_MS:WEEK_MS)}
+  function countdown(ms){const secs=Math.max(0,Math.floor(ms/1000)),days=Math.floor(secs/86400),hours=Math.floor(secs%86400/3600),mins=Math.floor(secs%3600/60),seconds=secs%60;return (days?days+'d ':'')+String(hours).padStart(2,'0')+'h '+String(mins).padStart(2,'0')+'m '+String(seconds).padStart(2,'0')+'s'}
+  function toast(text){const t=el('toast');t.textContent=text;t.classList.remove('hidden');clearTimeout(toast.timeout);toast.timeout=setTimeout(()=>t.classList.add('hidden'),4000)}
+  function stats(){
+    for(const [frequency,prefix] of [['daily','daily'],['weekly','weekly'],['goal','goal']]){
+      const subset=tasks.filter(t=>t.frequency===frequency), count=subset.filter(complete).length;
+      el(prefix+'Progress').textContent=count+' / '+subset.length;
+      el(prefix+'Bar').style.width=(subset.length?count/subset.length*100:0)+'%';
+    }
+  }
+  function refreshCountdowns(){el('dailyCountdown').textContent=countdown(nextReset('daily')-Date.now());el('weeklyCountdown').textContent=countdown(nextReset('weekly')-Date.now())}
+  function dom(tag,className,text){const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n}
+  const groups=[{key:'daily',name:'Daily duties',accent:'✦'},{key:'weekly',name:'Weekly pursuits',accent:'✦'},{key:'goal',name:'Long-term goals',accent:'✦'}];
+  function makeTask(t){
+    const done=complete(t),outer=dom('div','task'+(done?' done':''));
+    const check=dom('input');check.type='checkbox';check.checked=done;check.setAttribute('aria-label','Mark '+t.title+' as '+(done?'not completed':'completed'));
+    check.addEventListener('change',()=>{
+      if(t.frequency==='goal')t.done=check.checked;
+      else t.doneCycle=check.checked?cycleId(t.frequency):'';
+      persist();render();
+    });
+    outer.append(check);
+    const main=dom('div','task-main');main.append(dom('div','task-title',t.title));
+    if(t.notes)main.append(dom('div','task-notes',t.notes));
+    if(t.category)main.append(dom('div','category',t.category));
+    outer.append(main);
+    const controls=dom('div','task-controls');
+    const edit=dom('button','icon-btn','✎');edit.title='Edit '+t.title;edit.type='button';edit.setAttribute('aria-label',edit.title);edit.addEventListener('click',()=>openEditor(t.id));
+    const remove=dom('button','icon-btn','×');remove.title='Delete '+t.title;remove.type='button';remove.setAttribute('aria-label',remove.title);remove.addEventListener('click',()=>{if(confirm('Delete "'+t.title+'"?')){tasks=tasks.filter(x=>x.id!==t.id);persist();render()}});
+    controls.append(edit,remove);outer.append(controls);return outer;
+  }
+  function renderPersonal(){
+    const container=el('personalTasks');if(!container)return;
+    container.replaceChildren();
+    const available=groups.map(g=>({...g,items:tasks.filter(t=>t.frequency===g.key)})).filter(g=>g.items.length);
+    if(!available.length){container.append(dom('div','adv-small','No personal tasks yet. Use New task above to add one.'));return}
+    for(const g of available){
+      const section=dom('section','personal-task-group');section.append(dom('h4','',g.name));
+      for(const t of g.items)section.append(makeTask(t));container.append(section);
+    }
+  }
+  function render(){
+    stats();refreshCountdowns();renderPersonal();window.EorzeaAdventurer?.updateProgress?.();
+    el('taskFrequency').options[0].textContent='Every day · '+window.EorzeaClock.format(nextReset('daily'),{hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+    el('taskFrequency').options[1].textContent='Every week · '+window.EorzeaClock.format(nextReset('weekly'),{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+    const fmt={weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'};
+    el('resetNote').textContent='Next daily: '+window.EorzeaClock.format(nextReset('daily'),fmt)+' · Weekly: '+window.EorzeaClock.format(nextReset('weekly'),fmt);
+  }
+  window.EorzeaTasks={refresh:render,renderPersonal,getCounts:()=>Object.fromEntries(groups.map(g=>[g.key,{total:tasks.filter(t=>t.frequency===g.key).length,done:tasks.filter(t=>t.frequency===g.key&&complete(t)).length}]))};
+  function openEditor(id=null){
+    editingId=id;const t=tasks.find(item=>item.id===id);
+    el('editorHeading').textContent=t?'Edit task':'New task';
+    el('taskName').value=t?.title??'';el('taskFrequency').value=t?.frequency??'daily';el('taskCategory').value=t?.category??'';el('taskNotes').value=t?.notes??'';
+    el('editorBackdrop').classList.remove('hidden');el('taskName').focus();
+  }
+  function closeEditor(){el('editorBackdrop').classList.add('hidden');editingId=null}
+  el('editorForm').addEventListener('submit',e=>{
+    e.preventDefault();const title=el('taskName').value.trim();if(!title)return;
+    const frequency=el('taskFrequency').value, category=el('taskCategory').value.trim(),notes=el('taskNotes').value.trim();
+    if(editingId){const t=tasks.find(x=>x.id===editingId);if(t){if(t.frequency!==frequency){t.done=false;t.doneCycle=''}Object.assign(t,{title,frequency,category,notes})}}
+    else tasks.push(normalize({id:uuid(),title,frequency,category,notes}));
+    persist();closeEditor();render();toast('Task saved!');
+  });
+  el('addBtn').addEventListener('click',()=>openEditor());el('cancelBtn').addEventListener('click',closeEditor);
+  el('editorBackdrop').addEventListener('mousedown',e=>{if(e.target===el('editorBackdrop'))closeEditor()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEditor()});
+
+  document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
+    filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});render();
+  }));
+  el('exportBtn').addEventListener('click',()=>{
+    const payload=JSON.stringify({app:'eorzea-checklist',version:5,exportedAt:new Date().toISOString(),tasks,endgame:window.EorzeaRaid?.export?.(),adventurer:window.EorzeaAdventurer?.export?.(),glamour:window.EorzeaGlam?.export?.()},null,2);
+    const blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='eorzea-checklist-backup.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Backup downloaded!');
+  });
+  el('importBtn').addEventListener('click',()=>el('fileInput').click());
+  el('fileInput').addEventListener('change',async e=>{
+    const file=e.target.files?.[0];if(!file)return;
+    try{
+      if(file.size>2_000_000)throw new Error('File is too large.');
+      const content=JSON.parse(await file.text()),items=Array.isArray(content)?content:content?.tasks;
+      if(!Array.isArray(items)||items.length>3000||!items.every(validTask))throw new Error('Not a valid checklist backup.');
+      if(!confirm('Replace all your current tasks with the '+items.length+' tasks in this backup?'))return;
+      const ids=new Set();tasks=items.map(t=>{const x=normalize(t);if(ids.has(x.id))x.id=uuid();ids.add(x.id);return x});if(content?.endgame&&window.EorzeaRaid?.import)window.EorzeaRaid.import(content.endgame);if(content?.adventurer&&window.EorzeaAdventurer?.import)window.EorzeaAdventurer.import(content.adventurer);if(content?.glamour&&window.EorzeaGlam?.import)window.EorzeaGlam.import(content.glamour);persist();render();toast('Backup restored.');
+    }catch(err){alert('Could not restore backup: '+err.message)}finally{e.target.value=''}
+  });
+  persist();render();
+  // Keep timers current and refresh completion state after every real reset.
+  let lastDaily=cycleId('daily'),lastWeekly=cycleId('weekly');
+  setInterval(()=>{
+    const daily=cycleId('daily'),weekly=cycleId('weekly');
+    if(lastDaily!==daily||lastWeekly!==weekly){lastDaily=daily;lastWeekly=weekly;render()}
+    else refreshCountdowns();
+  },1000);
+})();
+</script>
+<script>
+/* Eorzea Checklist · Raid HQ — standalone, offline, vanilla JavaScript */
+(() => {
+  'use strict';
+  const KEY='eorzea-raid-hq-v1', WEEK=7*86400000;
+  const byId=id=>document.getElementById(id);
+  const uid=()=>globalThis.crypto?.randomUUID?.()??('r'+Date.now().toString(36)+Math.random().toString(36).slice(2));
+  const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const clamp=(v,min,max)=>Math.min(max,Math.max(min,Number.isFinite(Number(v))?Number(v):min));
+  const positive=(v,max=999999)=>Math.floor(clamp(v,0,max));
+  const percent=v=>clamp(v,0,100);
+  const jobNames={PLD:'Paladin',WAR:'Warrior',DRK:'Dark Knight',GNB:'Gunbreaker',WHM:'White Mage',SCH:'Scholar',AST:'Astrologian',SGE:'Sage',MNK:'Monk',DRG:'Dragoon',NIN:'Ninja',SAM:'Samurai',RPR:'Reaper',VPR:'Viper',BRD:'Bard',MCH:'Machinist',DNC:'Dancer',BLM:'Black Mage',SMN:'Summoner',RDM:'Red Mage',PCT:'Pictomancer'};
+  // Known expansion and raid tier catalogue. Everything outside the selected tier remains saved.
+  // An array item is [short fight code, duty name]. Ultimate is represented as its own tier.
+  const raidCatalog={
+    dawntrail:{label:'Dawntrail · 7.x',tiers:{
+      light:{label:'Arcadion · Light-heavyweight',fights:[1,2,3,4].map(i=>[`M${i}S`,`AAC Light-heavyweight M${i} (Savage)`])},
+      cruiser:{label:'Arcadion · Cruiserweight',fights:[5,6,7,8].map((i,n)=>[`M${i}S`,`AAC Cruiserweight M${n+1} (Savage)`])},
+      heavyweight:{label:'Arcadion · Heavyweight',fights:[9,10,11,12].map((i,n)=>[`M${i}S`,`AAC Heavyweight M${n+1} (Savage)`])},
+      ultimate:{label:'Ultimate raids',fights:[['FRU','Futures Rewritten (Ultimate)'],['DMU','Dancing Mad (Ultimate)']]}
+    }},
+    endwalker:{label:'Endwalker · 6.x',tiers:{
+      asphodelos:{label:'Pandæmonium · Asphodelos',fights:[1,2,3,4].map(i=>[`P${i}S`,`Asphodelos: The ${['First','Second','Third','Fourth'][i-1]} Circle (Savage)`])},
+      abyssos:{label:'Pandæmonium · Abyssos',fights:[5,6,7,8].map((i,n)=>[`P${i}S`,`Abyssos: The ${['Fifth','Sixth','Seventh','Eighth'][n]} Circle (Savage)`])},
+      anabaseios:{label:'Pandæmonium · Anabaseios',fights:[9,10,11,12].map((i,n)=>[`P${i}S`,`Anabaseios: The ${['Ninth','Tenth','Eleventh','Twelfth'][n]} Circle (Savage)`])},
+      ultimate:{label:'Ultimate raids',fights:[['DSR','Dragonsong’s Reprise (Ultimate)'],['TOP','The Omega Protocol (Ultimate)']]}
+    }},
+    shadowbringers:{label:'Shadowbringers · 5.x',tiers:{
+      gate:{label:'Eden’s Gate',fights:[1,2,3,4].map(i=>[`E${i}S`,`Eden’s Gate ${['Resurrection','Descent','Inundation','Sepulture'][i-1]} (Savage)`])},
+      verse:{label:'Eden’s Verse',fights:[5,6,7,8].map((i,n)=>[`E${i}S`,`Eden’s Verse ${['Fulmination','Furor','Iconoclasm','Refulgence'][n]} (Savage)`])},
+      promise:{label:'Eden’s Promise',fights:[9,10,11,12].map((i,n)=>[`E${i}S`,`Eden’s Promise ${['Umbra','Litany','Anamorphosis','Eternity'][n]} (Savage)`])},
+      ultimate:{label:'Ultimate raids',fights:[['TEA','The Epic of Alexander (Ultimate)']]}
+    }},
+    stormblood:{label:'Stormblood · 4.x',tiers:{
+      delta:{label:'Omega · Deltascape',fights:[1,2,3,4].map(i=>[`O${i}S`,`Deltascape V${i}.0 (Savage)`])},
+      sigma:{label:'Omega · Sigmascape',fights:[5,6,7,8].map((i,n)=>[`O${i}S`,`Sigmascape V${n+1}.0 (Savage)`])},
+      alpha:{label:'Omega · Alphascape',fights:[9,10,11,12].map((i,n)=>[`O${i}S`,`Alphascape V${n+1}.0 (Savage)`])},
+      ultimate:{label:'Ultimate raids',fights:[['UCoB','The Unending Coil of Bahamut (Ultimate)'],['UWU','The Weapon’s Refrain (Ultimate)']]}
+    }},
+    heavensward:{label:'Heavensward · 3.x',tiers:{
+      gordias:{label:'Alexander · Gordias',fights:[1,2,3,4].map(i=>[`A${i}S`,`Alexander: Gordias Floor ${i} (Savage)`])},
+      midas:{label:'Alexander · Midas',fights:[5,6,7,8].map((i,n)=>[`A${i}S`,`Alexander: Midas Floor ${n+1} (Savage)`])},
+      creator:{label:'Alexander · The Creator',fights:[9,10,11,12].map((i,n)=>[`A${i}S`,`Alexander: The Creator Floor ${n+1} (Savage)`])}
+    }},
+    realmreborn:{label:'A Realm Reborn · 2.x',tiers:{
+      binding:{label:'The Binding Coil',fights:[1,2,3,4,5].map(i=>[`T${i}`,`Binding Coil of Bahamut · Turn ${i}`])},
+      second:{label:'The Second Coil',fights:[6,7,8,9].map(i=>[`T${i}`,`Second Coil of Bahamut · Turn ${i-5}`])},
+      final:{label:'The Final Coil',fights:[10,11,12,13].map(i=>[`T${i}`,`Final Coil of Bahamut · Turn ${i-9}`])}
+    }}
+  };
+  const jobRoles={PLD:'tanks',WAR:'tanks',DRK:'tanks',GNB:'tanks',WHM:'healers',SCH:'healers',AST:'healers',SGE:'healers',MNK:'melee',DRG:'melee',NIN:'melee',SAM:'melee',RPR:'melee',VPR:'melee',BRD:'ranged',MCH:'ranged',DNC:'ranged',BLM:'casters',SMN:'casters',RDM:'casters',PCT:'casters'};
+  const balanceUrls=job=>{const slug=jobNames[job].toLowerCase().replace(/ /g,'-'),base=`https://www.thebalanceffxiv.com/jobs/${jobRoles[job]}/${slug}/`;return {hub:base,bis:base+'best-in-slot/'}};
+  const tierId=(exp,tier)=>`${exp}:${tier}`;
+  const tierInfo=(exp,tier)=>raidCatalog[exp]?.tiers[tier];
+  const defaultTier=exp=>({dawntrail:'heavyweight',endwalker:'anabaseios',shadowbringers:'promise',stormblood:'alpha',heavensward:'creator',realmreborn:'final'})[exp]||Object.keys(raidCatalog[exp].tiers)[0];
+  function inferScope(r){
+    if(r?.group==='savage')return ['dawntrail','heavyweight'];
+    if(r?.group==='ultimate'){
+      const code=String(r.code||'').toUpperCase(),name=String(r.name||'').toLowerCase();
+      if(['UCOB','UWU'].includes(code)||/bahamut|weapon.s refrain/.test(name))return ['stormblood','ultimate'];
+      if(code==='TEA'||/epic of alexander/.test(name))return ['shadowbringers','ultimate'];
+      if(['TOP','DSR'].includes(code)||/omega protocol|dragonsong/.test(name))return ['endwalker','ultimate'];
+      return ['dawntrail','ultimate'];
+    }
+    return ['dawntrail','heavyweight'];
+  }
+  const slots=['Weapon','Head','Body','Hands','Legs','Feet','Earrings','Necklace','Bracelets','Ring 1','Ring 2'];
+  const groups=[['savage','Other Savage / Coil tiers'],['ultimate','Other Ultimate raids'],['extreme','Extreme & Unreal'],['other','Custom endgame']];
+  const statusLabels={'not-started':'Not started',learning:'Learning',prog:'Progging',cleared:'Cleared',farm:'Farming'};
+  const seeds=[
+    ['M9S','AAC Heavyweight M1 (Savage)','savage'],
+    ['M10S','AAC Heavyweight M2 (Savage)','savage'],
+    ['M11S','AAC Heavyweight M3 (Savage)','savage'],
+    ['M12S','AAC Heavyweight M4 (Savage)','savage'],
+    ['DMD','Dancing Mad (Ultimate)','ultimate'],
+    ['FRU','Futures Rewritten (Ultimate)','ultimate'],
+    ['TOP','The Omega Protocol (Ultimate)','ultimate'],
+    ['DSR','Dragonsong’s Reprise (Ultimate)','ultimate'],
+    ['TEA','The Epic of Alexander (Ultimate)','ultimate'],
+    ['UWU','The Weapon’s Refrain (Ultimate)','ultimate'],
+    ['UCoB','The Unending Coil of Bahamut (Ultimate)','ultimate'],
+    ['EX','The Unmaking (Extreme)','extreme'],
+    ['EX','Hell on Rails (Extreme)','extreme'],
+    ['UNREAL','Shinryu’s Domain (Unreal)','extreme']
+  ];
+  const cycleStart=(now=Date.now())=>{const d=new Date(now),delta=(d.getUTCDay()-2+7)%7;let ms=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-delta,8);if(ms>now)ms-=WEEK;return ms};
+  const weekId=()=>new Date(cycleStart()).toISOString();
+  const nextWeek=()=>new Date(cycleStart()+WEEK);
+  const todayLocal=()=>{const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`};
+  const fmtDate=v=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(v??''))return v||'—';const [y,m,d]=v.split('-').map(Number);const date=new Date(y,m-1,d);return date.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})};
+  const number=v=>Number(v||0).toLocaleString();
+  const makeRaid=(name,code,group,expansion='dawntrail',tier='heavyweight')=>({id:uid(),name,code,group,expansion,tier,status:'not-started',best:0,phase:'',notes:'',weeklyCycle:'',weeklyCount:0,total:0});
+  const defaultGear=()=>slots.map(slot=>({slot,item:'',source:'Savage',current:0,target:0,obtained:false}));
+  function fresh(){return {raids:seeds.map(([code,name,group])=>{const [exp,tier]=inferScope({code,name,group});return makeRaid(name,code,group,exp,tier)}),activeJob:'WAR',activeExpansion:'dawntrail',activeTier:'heavyweight',lastTiers:{dawntrail:'heavyweight'},visitedTiers:['dawntrail:heavyweight'],gear:{WAR:defaultGear()},gearPlans:{},currencies:[
+    {id:uid(),name:'Allagan Tomestones of Mnemonics',balance:0,carryCap:2000,weekly:0,weeklyCap:450,weekCycle:weekId()},
+    {id:uid(),name:'Allagan Tomestones of Mathematics',balance:0,carryCap:2000,weekly:0,weeklyCap:0,weekCycle:weekId()},
+    {id:uid(),name:'Savage books / tokens',balance:0,carryCap:0,weekly:0,weeklyCap:0,weekCycle:weekId()}
+  ],loot:[]}}
+  function safeRaid(r){return {id:String(r?.id||uid()).slice(0,120),name:String(r?.name||'Untitled encounter').slice(0,110),code:String(r?.code||'RAID').slice(0,16),group:groups.some(g=>g[0]===r?.group)?r.group:'other',expansion:raidCatalog[r?.expansion]?r.expansion:inferScope(r)[0],tier:tierInfo(r?.expansion,r?.tier)?r.tier:raidCatalog[r?.expansion]?defaultTier(r.expansion):inferScope(r)[1],status:Object.hasOwn(statusLabels,r?.status)?r.status:'not-started',best:percent(r?.best),phase:String(r?.phase||'').slice(0,100),notes:String(r?.notes||'').slice(0,800),weeklyCycle:String(r?.weeklyCycle||'').slice(0,50),weeklyCount:positive(r?.weeklyCount),total:positive(r?.total)}}
+  function safeGear(raw){const mapped=new Map(Array.isArray(raw)?raw.filter(Boolean).map(g=>[g.slot,g]):[]);return slots.map(slot=>{const g=mapped.get(slot)||{};return {slot,item:String(g.item||'').slice(0,110),source:['Savage','Tomestones','Crafted','Extreme','Other'].includes(g.source)?g.source:'Other',current:positive(g.current,9999),target:positive(g.target,9999),obtained:g.obtained===true}})}
+  function safeCurrency(c){return {id:String(c?.id||uid()).slice(0,120),name:String(c?.name||'Custom resource').slice(0,90),balance:positive(c?.balance,99999999),carryCap:positive(c?.carryCap,99999999),weekly:positive(c?.weekly,99999999),weeklyCap:positive(c?.weeklyCap,99999999),weekCycle:String(c?.weekCycle||'').slice(0,50)}}
+  function safeLoot(l){return {id:String(l?.id||uid()).slice(0,120),raid:String(l?.raid||'Other').slice(0,140),item:String(l?.item||'Unknown reward').slice(0,120),qty:Math.max(1,positive(l?.qty,999)),date:/^\d{4}-\d{2}-\d{2}$/.test(l?.date||'')?l.date:todayLocal(),notes:String(l?.notes||'').slice(0,150)}}
+  function safeState(v){if(!v||typeof v!=='object'||!Array.isArray(v.raids)||v.raids.length>300||!Array.isArray(v.loot)||v.loot.length>10000)throw new Error('Invalid endgame backup.');
+    const gear={};if(v.gear&&typeof v.gear==='object'){for(const job of Object.keys(jobNames))if(Object.hasOwn(v.gear,job))gear[job]=safeGear(v.gear[job])}
+    const raids=v.raids.map(safeRaid),loot=v.loot.map(safeLoot),currencies=(Array.isArray(v.currencies)?v.currencies:[]).slice(0,50).map(safeCurrency);
+    const activeExpansion=Object.hasOwn(raidCatalog,v.activeExpansion)?v.activeExpansion:'dawntrail';
+    const activeTier=tierInfo(activeExpansion,v.activeTier)?v.activeTier:defaultTier(activeExpansion);
+    const gearPlans={};if(v.gearPlans&&typeof v.gearPlans==='object'){for(const [k,plan] of Object.entries(v.gearPlans).slice(0,500)){
+      const [ex,ti,job]=k.split(':');if(tierInfo(ex,ti)&&Object.hasOwn(jobNames,job))gearPlans[k]=safeGear(plan);
+    }}
+    const lastTiers={};for(const [ex,ti] of Object.entries(v.lastTiers&&typeof v.lastTiers==='object'?v.lastTiers:{})){if(tierInfo(ex,ti))lastTiers[ex]=ti}
+    lastTiers[activeExpansion]=activeTier;
+    const visitedTiers=Array.isArray(v.visitedTiers)?v.visitedTiers.filter(k=>{const [ex,ti]=String(k).split(':');return !!tierInfo(ex,ti)}).slice(0,100):['dawntrail:heavyweight'];
+    if(!visitedTiers.includes('dawntrail:heavyweight'))visitedTiers.push('dawntrail:heavyweight');
+    return {raids,activeJob:Object.hasOwn(jobNames,v.activeJob)?v.activeJob:'WAR',activeExpansion,activeTier,lastTiers,visitedTiers,gear,gearPlans,currencies,loot};}
+  function load(){try{const value=localStorage.getItem(KEY);if(value)return safeState(JSON.parse(value))}catch(err){console.warn('Raid save could not be loaded:',err)}return fresh()}
+  let state=load(),activeTab='overview',editing=null,lastWeekly=weekId(),otherEncountersOpen=false,pendingCurrencyDelete=null;
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){notify('Saving blocked in this browser. Download a backup.')}}
+  function notify(str){const toast=byId('toast');toast.textContent=str;toast.classList.remove('hidden');clearTimeout(notify.timeout);notify.timeout=setTimeout(()=>toast.classList.add('hidden'),3200)}
+  const thisWeek=r=>r.weeklyCycle===weekId()?r.weeklyCount:0;
+  const earnedThisWeek=c=>c.weekCycle===weekId()?c.weekly:0;
+  const currentPlanKey=()=>`${state.activeExpansion}:${state.activeTier}:${state.activeJob}`;
+  const currentGear=()=>{
+    const key=currentPlanKey();
+    if(!state.gearPlans[key]){
+      // Migrate v3 per-job gear to its original Dawntrail Heavyweight scope on first access.
+      state.gearPlans[key]=state.activeExpansion==='dawntrail'&&state.activeTier==='heavyweight'&&state.gear[state.activeJob]
+        ?safeGear(state.gear[state.activeJob]):defaultGear();
+    }
+    return state.gearPlans[key];
+  };
+  const selectedRaids=()=>state.raids.filter(r=>r.expansion===state.activeExpansion&&r.tier===state.activeTier&&r.group===(state.activeTier==='ultimate'?'ultimate':'savage'));
+  const selectedLabel=()=>tierInfo(state.activeExpansion,state.activeTier)?.label||'Selected tier';
+  function ensureTier(){
+    const id=tierId(state.activeExpansion,state.activeTier);
+    if(state.visitedTiers.includes(id))return;
+    const group=state.activeTier==='ultimate'?'ultimate':'savage';
+    for(const [code,name] of tierInfo(state.activeExpansion,state.activeTier).fights){
+      if(!state.raids.some(r=>r.expansion===state.activeExpansion&&r.tier===state.activeTier&&r.group===group&&(r.code.toUpperCase()===code.toUpperCase()||r.name===name))){
+        state.raids.push(makeRaid(name,code,group,state.activeExpansion,state.activeTier));
+      }
+    }
+    state.visitedTiers.push(id);save();
+  }
+  function optionsExp(selected){return Object.entries(raidCatalog).map(([k,x])=>`<option value="${k}" ${selected===k?'selected':''}>${esc(x.label)}</option>`).join('')}
+  function optionsTier(exp,selected){return Object.entries(raidCatalog[exp].tiers).map(([k,x])=>`<option value="${k}" ${k===selected?'selected':''}>${esc(x.label)}</option>`).join('')}
+  const optionsJobs=selected=>Object.entries(jobNames).map(([k,v])=>`<option value="${k}" ${k===selected?'selected':''}>${esc(v)} · ${esc(k)}</option>`).join('');
+  function renderFocusPicker(){
+    byId('raidExpansion').innerHTML=optionsExp(state.activeExpansion);
+    byId('raidTier').innerHTML=optionsTier(state.activeExpansion,state.activeTier);
+    byId('raidMainJob').innerHTML=optionsJobs(state.activeJob);
+    const selected=selectedRaids(),cleared=selected.filter(r=>['cleared','farm'].includes(r.status)).length;
+    byId('raidFocusSummary').innerHTML=`<b>${esc(selectedLabel())}</b> · ${cleared}/${selected.length} cleared · main: <b>${esc(jobNames[state.activeJob])}</b>`;
+    const urls=balanceUrls(state.activeJob);
+    byId('raidBalanceLinks').innerHTML=`<a target="_blank" rel="noopener noreferrer" href="${urls.bis}">✦ ${esc(state.activeJob)} BiS gearsets ↗</a><a target="_blank" rel="noopener noreferrer" href="${urls.hub}">The Balance job guides ↗</a><small>Community-maintained guides open online. Current-patch BiS may differ from old Savage or synced Ultimate gear.</small>`;
+    byId('raidHeroEyebrow').textContent=`${raidCatalog[state.activeExpansion].label} · ${selectedLabel()}`;
+  }
+  const acquired=gear=>gear.filter(g=>g.obtained).length;
+  function changeMain(view){for(const name of ['checklist','endgame','config','glam']){byId(name+'View').classList.toggle('hidden',name!==view)}document.querySelectorAll('[data-main-view]').forEach(b=>{b.classList.toggle('active',b.dataset.mainView===view);b.setAttribute('aria-pressed',String(b.dataset.mainView===view))});if(view==='endgame')render()}
+  document.querySelectorAll('[data-main-view]').forEach(b=>b.addEventListener('click',()=>changeMain(b.dataset.mainView)));
+  document.querySelectorAll('[data-raid-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.raidTab)));
+  const miniProgress=(value,type='')=>`<div class="progress-slim ${type}"><i style="width:${clamp(value,0,100)}%"></i></div>`;
+  function renderOverview(){
+    const savage=selectedRaids(),ults=state.raids.filter(r=>r.group==='ultimate'),
+    cleared=raids=>raids.filter(r=>['cleared','farm'].includes(r.status)).length,
+    weekly=state.raids.reduce((sum,r)=>sum+thisWeek(r),0),gear=currentGear(),
+    tome=state.currencies.find(c=>c.name.toLowerCase().includes('mnemonics')),
+    tomeWeek=tome?earnedThisWeek(tome):0;
+    const focus=selectedRaids().filter(r=>['learning','prog'].includes(r.status)).sort((a,b)=>b.best-a.best).slice(0,5);
+    const freshLoot=[...state.loot].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,4);
+    byId('raidContent').innerHTML=`
+      <div class="raid-stats">
+        <div class="metric"><div class="metric-label">Selected tier clears</div><div class="metric-value">${cleared(savage)} <span style="font-size:14px;color:#9fb2c6">/ ${savage.length}</span></div><div class="metric-sub">${esc(selectedLabel())}</div></div>
+        <div class="metric"><div class="metric-label">Ultimate cleared</div><div class="metric-value">${cleared(ults)} <span style="font-size:14px;color:#9fb2c6">/ ${ults.length}</span></div><div class="metric-sub">Ultimate goals completed</div></div>
+        <div class="metric"><div class="metric-label">Weekly farming runs</div><div class="metric-value">${number(weekly)}</div><div class="metric-sub">Manual clear log this week</div></div>
+        <div class="metric"><div class="metric-label">${esc(state.activeJob)} best-in-slot plan</div><div class="metric-value">${acquired(gear)} <span style="font-size:14px;color:#9fb2c6">/ ${slots.length}</span></div><div class="metric-sub">Target pieces obtained</div></div>
+      </div>
+      <div class="raid-layout">
+        <div class="raid-stack">
+          <section class="raid-panel"><div class="raid-heading"><h3>Progression at a glance</h3><span class="muted-badge">Manually tracked</span></div>
+          <div class="progress-label"><span>${esc(selectedLabel())} clears</span><b>${cleared(savage)} / ${savage.length}</b></div>${miniProgress(savage.length?100*cleared(savage)/savage.length:0)}
+          <div class="progress-label"><span>Ultimate clears</span><b>${cleared(ults)} / ${ults.length}</b></div>${miniProgress(ults.length?100*cleared(ults)/ults.length:0,'cyan')}
+          <div class="progress-label"><span>${esc(state.activeJob)} target gear</span><b>${acquired(gear)} / ${slots.length}</b></div>${miniProgress(100*acquired(gear)/slots.length,'green')}
+          <div class="progress-label"><span>${esc(tome?.name||'Weekly tomestones')}</span><b>${number(tomeWeek)} / ${number(tome?.weeklyCap||450)}</b></div>${miniProgress(tome?.weeklyCap?100*tomeWeek/tome.weeklyCap:0)}
+          <div class="raid-actions" style="margin-top:15px"><button class="btn small" data-action="show-encounters">Manage encounters →</button><button class="btn small" data-action="show-gear">Gear planner →</button></div></section>
+          <section class="raid-panel"><div class="raid-heading"><h3>Current tier progression</h3><span class="muted-badge">${focus.length} in progress</span></div>
+            ${focus.length?focus.map(r=>`<div class="focus-item"><div style="min-width:0"><div class="mini-code">${esc(r.code)} <b style="color:#e5edf7">${esc(r.name)}</b></div><p>${esc(r.phase||r.notes||'Set a phase or mechanic to practise next.')} · ${r.best}% reached</p></div><button class="btn small" data-action="edit-raid" data-id="${esc(r.id)}">Update</button></div>`).join(''):'<div class="empty-lite">No active prog in this selected tier. Set an encounter to Learning or Progging to pin it here.</div>'}
+          </section>
+        </div>
+        <div class="raid-stack">
+          <section class="raid-panel"><h3>Reset headquarters</h3><p class="section-sub">FFXIV weekly reset: Tuesday 08:00 UTC</p><div class="metric-value" style="font-size:23px;font-weight:800;color:#ecd49f" id="raidWeekClock">—</div><p class="stat-hint" id="raidResetLocal"></p><div class="inline-note">Savage farming goals refresh weekly in this app. Lifetime clear counts and gear do not reset.</div></section>
+          <section class="raid-panel"><div class="raid-heading"><h3>Latest loot</h3><button class="btn small" data-action="add-loot">＋ Log loot</button></div>${freshLoot.length?freshLoot.map(l=>`<div class="focus-item"><div><b>${esc(l.item)}${l.qty>1?' ×'+number(l.qty):''}</b><p>${esc(l.raid)} · ${esc(fmtDate(l.date))}</p></div></div>`).join(''):'<div class="empty-lite">Nothing logged yet. Your first coffer awaits!</div>'}<button class="btn small" data-action="show-loot" style="margin-top:14px">Open loot journal →</button></section>
+        </div>
+      </div>`;
+    renderResetClock();
+  }
+  function raidCard(r){
+    const done=['cleared','farm'].includes(r.status),week=thisWeek(r);
+    return `<article class="raid-card"><div class="raid-card-top"><div class="raid-code">${esc(r.code||'RAID')}</div><span class="status ${['prog','learning'].includes(r.status)?'prog':done?r.status:''}">${esc(statusLabels[r.status])}</span></div>
+      <h4>${esc(r.name)}</h4><div class="raid-card-note">${esc(r.phase||r.notes||'No phase or strategy notes yet')}</div>
+      <div class="progress-label"><span>Fight progress reached</span><b>${r.best}%</b></div>${miniProgress(r.best,done?'green':'cyan')}
+      <div class="raid-card-foot"><span><strong style="color:#e2cc9c">${number(r.total)}</strong> lifetime · <strong style="color:#e2cc9c">${number(week)}</strong> this week</span><div class="raid-card-buttons"><button class="btn small" data-action="clear" data-id="${esc(r.id)}" title="Record one clear">＋ Clear</button><button class="btn small" data-action="edit-raid" data-id="${esc(r.id)}">Edit</button>${week?`<button class="btn small ghost" data-action="undo-clear" data-id="${esc(r.id)}" title="Undo one clear recorded this week">↶</button>`:''}</div></div></article>`
+  }
+  function renderEncounters(){
+    const chosen=selectedRaids(),ids=new Set(chosen.map(r=>r.id)),others=state.raids.filter(r=>!ids.has(r.id));
+    const cleared=arr=>arr.filter(r=>['cleared','farm'].includes(r.status)).length;
+    byId('raidContent').innerHTML=`<div class="raid-heading"><div><h3 style="font:normal 27px Georgia,serif;margin:0">${esc(selectedLabel())} encounter board</h3><p class="section-sub" style="margin:6px 0 0">${esc(raidCatalog[state.activeExpansion].label)} · Track every fight and mechanic in your selected tier.</p></div><button class="btn primary" data-action="new-raid">＋ Add encounter</button></div>
+      <div class="inline-note">Change the expansion or tier above to switch boards. Completed fights, old raids, and loot remain saved. The ＋ Clear button tracks your personal clear counts — not game loot lockouts.</div>
+      <div class="raid-heading"><h3>${esc(selectedLabel())}</h3><span class="muted-badge">${cleared(chosen)}/${chosen.length} cleared</span></div>
+      ${chosen.length?`<div class="raid-card-grid">${chosen.map(raidCard).join('')}</div>`:'<div class="empty-lite">No encounters added to this tier yet.</div>'}
+      <details class="raid-other-details" id="raidOtherDetails"><summary>Other tracked encounters (${others.length}) — browse your other tiers, Ultimates and custom raids</summary>
+      <p class="section-sub" style="margin-top:10px">These are not counted toward the selected tier. You can edit them here or switch to their expansion above.</p>
+      ${groups.map(([key,label])=>{const arr=others.filter(r=>r.group===key);return arr.length?`<section><h3 class="raid-section-title">${esc(label)} <span class="muted-badge">${cleared(arr)}/${arr.length}</span></h3><div class="raid-card-grid">${arr.map(raidCard).join('')}</div></section>`:''}).join('')}
+      </details>`;
+    const details=byId('raidOtherDetails');details.open=otherEncountersOpen;
+    details.addEventListener('toggle',()=>{otherEncountersOpen=details.open});
+  }
+  function renderGear(){
+    const gear=currentGear(),owned=acquired(gear),ilvs=gear.map(g=>g.current).filter(n=>n>0),all=ilvs.length===slots.length,avg=ilvs.length?Math.round(ilvs.reduce((a,b)=>a+b,0)/ilvs.length):0;
+    byId('raidContent').innerHTML=`<div class="raid-heading"><div><h3 style="font:normal 27px Georgia,serif;margin:0">Best-in-slot gear planner</h3><p class="section-sub" style="margin:6px 0 0">Gear targets are saved separately for each job and selected raid tier. Fill in the gear you actually want.</p></div><div class="raid-actions"><label for="gearJob" class="stat-hint">Job</label><select id="gearJob" class="btn" aria-label="Job gear planner">${Object.entries(jobNames).map(([code,name])=>`<option value="${esc(code)}" ${state.activeJob===code?'selected':''}>${esc(name)} (${code})</option>`).join('')}</select></div></div>
+      <div class="raid-panel" style="margin-bottom:15px"><h3>Community gear resources · ${esc(jobNames[state.activeJob])}</h3><p class="section-sub">Compare your plan with The Balance’s community-maintained BiS and progression sets. Open the guide and choose the correct patch, sync level, or Ultimate set for your selected fight.</p><div class="balance-resource-links"><a href="${balanceUrls(state.activeJob).bis}" target="_blank" rel="noopener noreferrer">✦ The Balance · Best in Slot ↗</a><a href="${balanceUrls(state.activeJob).hub}" target="_blank" rel="noopener noreferrer">Job rotation &amp; guides ↗</a><a href="https://xivgear.app/" target="_blank" rel="noopener noreferrer">XIVGear planner ↗</a></div><div class="stat-hint">Plan: ${esc(raidCatalog[state.activeExpansion].label)} → ${esc(selectedLabel())} → ${esc(state.activeJob)}. Switching any of these preserves this plan.</div></div>
+      <div class="raid-stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div class="metric"><div class="metric-label">Target items acquired</div><div class="metric-value">${owned} / ${slots.length}</div><div class="metric-sub">${Math.round(owned/slots.length*100)}% of your plan</div></div>
+        <div class="metric"><div class="metric-label">Current item levels entered</div><div class="metric-value">${ilvs.length} / ${slots.length}</div><div class="metric-sub">Fill all slots for average</div></div>
+        <div class="metric"><div class="metric-label">Item level ${all?'average':'(partial avg.)'}</div><div class="metric-value">${avg||'—'}</div><div class="metric-sub">${all?'Computed from all 11 slots':'Incomplete estimate, not in-game item level'}</div></div>
+      </div>
+      <div class="raid-panel"><div class="progress-label"><span>${esc(jobNames[state.activeJob])} target pieces obtained</span><b>${owned}/${slots.length}</b></div>${miniProgress(100*owned/slots.length,'green')}
+      <p class="section-sub" style="margin-top:14px">Tick Obtained when you've secured your chosen target piece. Current IL is your equipped piece's level; Target IL is your planned upgrade. These do not change automatically when you log loot.</p>
+      <div class="raid-table-wrap"><table class="raid-table"><thead><tr><th>Slot</th><th>Target item / notes</th><th>Source</th><th>Current IL</th><th>Target IL</th><th>Obtained</th></tr></thead><tbody>${gear.map(g=>`<tr data-slot="${esc(g.slot)}"><td class="slot-name">${esc(g.slot)}</td><td><input data-gear-field="item" class="item-name" maxlength="110" value="${esc(g.item)}" placeholder="Name or BiS goal"></td><td><select data-gear-field="source" class="small-source">${['Savage','Tomestones','Crafted','Extreme','Other'].map(src=>`<option ${g.source===src?'selected':''}>${src}</option>`).join('')}</select></td><td><input aria-label="${esc(g.slot)} current item level" type="number" min="0" max="9999" data-gear-field="current" value="${g.current||''}" placeholder="—"></td><td><input aria-label="${esc(g.slot)} target item level" type="number" min="0" max="9999" data-gear-field="target" value="${g.target||''}" placeholder="—"></td><td class="checkbox-cell"><input aria-label="${esc(g.slot)} target acquired" type="checkbox" data-gear-field="obtained" ${g.obtained?'checked':''}></td></tr>`).join('')}</tbody></table></div>
+      <div class="raid-actions" style="margin-top:15px"><button class="btn small ghost" data-action="reset-gear">Reset ${esc(state.activeJob)} gear plan</button></div>
+      </div>`;
+  }
+  function currencyProgress(c){
+    const week=earnedThisWeek(c);
+    return `${c.weeklyCap?`<div class="progress-label"><span>Weekly earned</span><b>${number(week)} / ${number(c.weeklyCap)}</b></div>${miniProgress(week/c.weeklyCap*100)}`:''}
+      ${c.carryCap?`<div class="progress-label"><span>Current balance</span><b>${number(c.balance)} / ${number(c.carryCap)}</b></div>${miniProgress(c.balance/c.carryCap*100,'cyan')}`:''}`;
+  }
+  function refreshCurrencyCard(row,c){
+    // Don't recreate the input/button DOM on blur: it can swallow the following click.
+    const heading=row.querySelector('.currency-top h4');if(heading)heading.textContent=c.name;
+    const progress=row.querySelector('[data-currency-progress]');if(progress)progress.innerHTML=currencyProgress(c);
+    const names={balance:'balance',weekly:'earned this week',weeklyCap:'weekly cap',carryCap:'inventory cap'};
+    for(const field of row.querySelectorAll('[data-currency-field][aria-label]')){
+      const label=names[field.dataset.currencyField];if(label)field.setAttribute('aria-label',`${c.name} ${label}`);
+    }
+  }
+  function renderCurrencies(){
+    byId('raidContent').innerHTML=`<div class="raid-heading"><div><h3 style="font:normal 27px Georgia,serif;margin:0">Currency vault</h3><p class="section-sub" style="margin:6px 0 0">Manually enter inventory balance and weekly earnings independently.</p></div><button type="button" class="btn primary" data-action="new-currency">＋ Add resource</button></div>
+      <div class="inline-note">The weekly earnings field resets each Tuesday at 08:00 UTC. Inventory balances do <b>not</b> reset. Zero in a cap field means uncapped. Default Mnemonics: 450 earned/week and 2,000 carried.</div>
+      ${state.currencies.length?state.currencies.map(c=>`<article class="currency-card" data-currency="${esc(c.id)}"><div class="currency-top"><h4>${esc(c.name)}</h4>${pendingCurrencyDelete===c.id?`<div class="currency-remove-confirm" role="group" aria-label="Confirm removing ${esc(c.name)}"><span class="warning">Remove this resource?</span><button type="button" class="btn small danger" data-action="confirm-delete-currency" data-id="${esc(c.id)}">Yes, remove</button><button type="button" class="btn small ghost" data-action="cancel-delete-currency">Cancel</button></div>`:`<button type="button" class="btn small ghost" data-action="delete-currency" data-id="${esc(c.id)}" title="Remove resource">Remove</button>`}</div>
+      <div data-currency-progress>${currencyProgress(c)}</div>
+      <div class="currency-grid" style="margin-top:15px"><div class="field"><label>Name</label><input data-currency-field="name" maxlength="90" value="${esc(c.name)}"></div><div class="field"><label>Balance in bag</label><input aria-label="${esc(c.name)} balance" type="number" data-currency-field="balance" min="0" max="99999999" value="${c.balance}"></div><div class="field"><label>Earned this week</label><input aria-label="${esc(c.name)} earned this week" type="number" data-currency-field="weekly" min="0" max="99999999" value="${earnedThisWeek(c)}"></div><div class="field"><label>Weekly cap (0 = none)</label><input aria-label="${esc(c.name)} weekly cap" type="number" data-currency-field="weeklyCap" min="0" max="99999999" value="${c.weeklyCap}"></div><div class="field"><label>Carry limit (0 = none)</label><input aria-label="${esc(c.name)} inventory cap" type="number" data-currency-field="carryCap" min="0" max="99999999" value="${c.carryCap}"></div></div></article>`).join(''):'<div class="empty-lite">No resources tracked. Add one to begin.</div>'}`;
+  }
+  function renderLoot(){
+    const sorted=[...state.loot].sort((a,b)=>b.date.localeCompare(a.date));
+    const total=state.loot.reduce((sum,l)=>sum+l.qty,0);
+    byId('raidContent').innerHTML=`<div class="raid-heading"><div><h3 style="font:normal 27px Georgia,serif;margin:0">The loot journal</h3><p class="section-sub" style="margin:6px 0 0">Every coffer, book, weapon, mount or lucky roll you want to remember.</p></div><button class="btn primary" data-action="add-loot">＋ Log a drop</button></div>
+      <div class="raid-stats" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="metric"><div class="metric-label">Loot records</div><div class="metric-value">${number(sorted.length)}</div><div class="metric-sub">All-time logged entries</div></div><div class="metric"><div class="metric-label">Total quantities logged</div><div class="metric-value">${number(total)}</div><div class="metric-sub">Including stack quantities</div></div></div>
+      <div class="raid-panel"><h3>Acquisition history</h3><p class="section-sub">Newest records first. Entries are independent of your equipment planner and clear count.</p><div class="loot-list">${sorted.length?sorted.map(l=>`<div class="loot-row"><div style="min-width:0"><b>${esc(l.item)} ${l.qty>1?'×'+number(l.qty):''}</b><p>${esc(l.raid)} · ${esc(fmtDate(l.date))}${l.notes?' · '+esc(l.notes):''}</p></div><button class="btn small ghost" data-action="delete-loot" data-id="${esc(l.id)}" title="Delete loot record">✕</button></div>`).join(''):'<div class="empty-lite">Your journal is empty. Record your next raid reward here.</div>'}</div></div>`;
+  }
+  function render(){renderFocusPicker();document.querySelectorAll('[data-raid-tab]').forEach(b=>{const selected=b.dataset.raidTab===activeTab;b.classList.toggle('active',selected);b.setAttribute('aria-selected',String(selected))});
+    if(activeTab==='overview')renderOverview();else if(activeTab==='encounters')renderEncounters();else if(activeTab==='gear')renderGear();else if(activeTab==='currencies')renderCurrencies();else renderLoot();}
+  function renderResetClock(){const n=byId('raidWeekClock');if(!n)return;const diff=Math.max(0,nextWeek()-new Date()),days=Math.floor(diff/86400000),hours=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000);n.textContent=`${days}d ${hours}h ${mins}m`;
+    byId('raidResetLocal').textContent='Next reset: '+window.EorzeaClock.format(nextWeek(),{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'})}
+  function showTab(name){if(name!=='currencies')pendingCurrencyDelete=null;activeTab=name;render();}
+  function editRaid(id=null){editing=id;const r=id?state.raids.find(x=>x.id===id):makeRaid('','',state.activeTier==='ultimate'?'ultimate':'savage',state.activeExpansion,state.activeTier);if(!r)return;
+    byId('raidEditorHeading').textContent=id?'Edit encounter':'New encounter';byId('raidEditorName').value=r.name;byId('raidEditorCode').value=r.code;byId('raidEditorGroup').value=r.group;byId('raidEditorExpansion').innerHTML=optionsExp(r.expansion);byId('raidEditorTier').innerHTML=optionsTier(r.expansion,r.tier);byId('raidEditorStatus').value=r.status;byId('raidEditorBest').value=r.best;byId('raidEditorTotal').value=r.total;byId('raidEditorPhase').value=r.phase;byId('raidEditorNotes').value=r.notes;byId('raidEditorDelete').classList.toggle('hidden',!id);byId('raidEditorBackdrop').classList.remove('hidden');byId('raidEditorName').focus()}
+  function closeRaidEditor(){byId('raidEditorBackdrop').classList.add('hidden');editing=null}
+  byId('raidEditorForm').addEventListener('submit',e=>{e.preventDefault();const name=byId('raidEditorName').value.trim();if(!name)return;const changes={name,code:byId('raidEditorCode').value.trim()||'RAID',group:byId('raidEditorGroup').value,expansion:byId('raidEditorExpansion').value,tier:byId('raidEditorTier').value,status:byId('raidEditorStatus').value,best:percent(byId('raidEditorBest').value),total:positive(byId('raidEditorTotal').value),phase:byId('raidEditorPhase').value.trim(),notes:byId('raidEditorNotes').value.trim()};
+    if(editing){const r=state.raids.find(x=>x.id===editing);if(r)Object.assign(r,changes)}else state.raids.push({...makeRaid(name,changes.code,changes.group),...changes});save();closeRaidEditor();render();notify('Encounter saved')});
+  byId('raidEditorExpansion').addEventListener('change',e=>{byId('raidEditorTier').innerHTML=optionsTier(e.target.value,defaultTier(e.target.value))});
+  byId('raidEditorGroup').addEventListener('change',e=>{if(e.target.value==='ultimate'&&tierInfo(byId('raidEditorExpansion').value,'ultimate'))byId('raidEditorTier').value='ultimate';else if(e.target.value==='savage'&&byId('raidEditorTier').value==='ultimate')byId('raidEditorTier').value=defaultTier(byId('raidEditorExpansion').value)});
+  byId('raidEditorCancel').addEventListener('click',closeRaidEditor);
+  byId('raidEditorDelete').addEventListener('click',()=>{if(editing&&confirm('Delete this encounter and its progress?')){state.raids=state.raids.filter(x=>x.id!==editing);save();closeRaidEditor();render();notify('Encounter removed')}});
+  byId('raidEditorBackdrop').addEventListener('click',e=>{if(e.target===e.currentTarget)closeRaidEditor()});
+  function openLoot(){const select=byId('lootEncounter');select.replaceChildren();for(const r of state.raids){const opt=document.createElement('option');opt.value=r.name;opt.textContent=`${r.code} · ${r.name}`;select.append(opt)}const other=document.createElement('option');other.value='Other';other.textContent='Other';select.append(other);byId('lootItem').value='';byId('lootQuantity').value=1;byId('lootDate').value=todayLocal();byId('lootNotes').value='';byId('lootEditorBackdrop').classList.remove('hidden');byId('lootItem').focus()}
+  function closeLoot(){byId('lootEditorBackdrop').classList.add('hidden')}
+  byId('lootEditorForm').addEventListener('submit',e=>{e.preventDefault();const item=byId('lootItem').value.trim();if(!item)return;state.loot.push(safeLoot({id:uid(),raid:byId('lootEncounter').value,item,qty:byId('lootQuantity').value,date:byId('lootDate').value,notes:byId('lootNotes').value}));save();closeLoot();render();notify('Loot added to journal')});
+  byId('lootCancel').addEventListener('click',closeLoot);
+  byId('lootEditorBackdrop').addEventListener('click',e=>{if(e.target===e.currentTarget)closeLoot()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRaidEditor();closeLoot()}});
+  byId('raidContent').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;
+    if(action==='new-raid')editRaid();
+    if(action==='edit-raid')editRaid(id);
+    if(action==='add-loot')openLoot();
+    if(action==='show-encounters')showTab('encounters');
+    if(action==='show-gear')showTab('gear');
+    if(action==='show-loot')showTab('loot');
+    if(action==='clear'||action==='undo-clear'){
+      const r=state.raids.find(x=>x.id===id);if(!r)return;const curr=thisWeek(r);
+      if(action==='undo-clear'){if(!curr||!r.total)return;r.weeklyCount=curr-1;r.total=Math.max(0,r.total-1)}
+      else{r.weeklyCycle=weekId();r.weeklyCount=curr+1;r.total++;if(!['cleared','farm'].includes(r.status)){r.status='cleared';r.best=100}}
+      save();render();notify(action==='clear'?'Clear recorded!':'Clear undone');
+    }
+    if(action==='reset-gear'&&confirm('Reset all target gear for '+jobNames[state.activeJob]+'?')){state.gearPlans[currentPlanKey()]=defaultGear();save();render();notify('Gear plan reset')}
+    if(action==='new-currency'){state.currencies.push(safeCurrency({id:uid(),name:'New resource',weekCycle:weekId()}));save();render();notify('Resource added')}
+    if(action==='delete-currency'){
+      if(!state.currencies.some(c=>c.id===id))return;
+      pendingCurrencyDelete=id;
+      renderCurrencies();
+      byId('raidContent').querySelector('[data-action="confirm-delete-currency"]')?.focus();
+      return;
+    }
+    if(action==='cancel-delete-currency'){
+      pendingCurrencyDelete=null;renderCurrencies();return;
+    }
+    if(action==='confirm-delete-currency'){
+      // Confirm the specific resource shown, never a stale or unrelated card.
+      if(!id||id!==pendingCurrencyDelete||!state.currencies.some(c=>c.id===id))return;
+      state.currencies=state.currencies.filter(c=>c.id!==id);
+      pendingCurrencyDelete=null;save();render();notify('Resource removed');return;
+    }
+    if(action==='delete-loot'&&confirm('Remove this loot entry?')){state.loot=state.loot.filter(l=>l.id!==id);save();render()}
+  });
+  function updateCurrencyField(t,updateCard){
+    const row=t.closest('[data-currency]');if(!row)return;
+    const c=state.currencies.find(x=>x.id===row.dataset.currency);if(!c)return;
+    const f=t.dataset.currencyField;
+    if(f==='name')c.name=t.value.trim().slice(0,90)||'Custom resource';
+    else if(f==='weekly'){c.weekly=positive(t.value,99999999);c.weekCycle=weekId()}
+    else c[f]=positive(t.value,99999999);
+    save();
+    // Update the summary while typing, not on blur. Mutating layout during
+    // pointerdown → blur/change → pointerup can swallow the Remove click.
+    if(updateCard)refreshCurrencyCard(row,c);
+  }
+  byId('raidContent').addEventListener('input',e=>{
+    if(e.target.dataset.currencyField)updateCurrencyField(e.target,true);
+  });
+  byId('raidContent').addEventListener('change',e=>{
+    const t=e.target;if(t.id==='gearJob'){if(Object.hasOwn(jobNames,t.value)){state.activeJob=t.value;currentGear();save();render()}return}
+    if(t.dataset.gearField){const row=t.closest('[data-slot]');if(!row)return;const g=currentGear().find(x=>x.slot===row.dataset.slot);if(!g)return;const f=t.dataset.gearField;g[f]=f==='obtained'?t.checked:['current','target'].includes(f)?positive(t.value,9999):f==='source'?['Savage','Tomestones','Crafted','Extreme','Other'].includes(t.value)?t.value:'Other':String(t.value).slice(0,110);save();render();return}
+    if(t.dataset.currencyField)updateCurrencyField(t,false);
+  });
+  function updateFocus(e){
+    const t=e.target;
+    if(t.id==='raidExpansion'){
+      state.activeExpansion=t.value;
+      state.activeTier=state.lastTiers[t.value]||defaultTier(t.value);
+    }else if(t.id==='raidTier')state.activeTier=t.value;
+    else if(t.id==='raidMainJob')state.activeJob=t.value;
+    else return;
+    if(!raidCatalog[state.activeExpansion]||!tierInfo(state.activeExpansion,state.activeTier)||!jobNames[state.activeJob])return;
+    state.lastTiers[state.activeExpansion]=state.activeTier;
+    ensureTier();currentGear();save();render();
+  }
+  for(const id of ['raidExpansion','raidTier','raidMainJob'])byId(id).addEventListener('change',updateFocus);
+  window.EorzeaRaid={refresh:render,export:()=>structuredClone(state),import:v=>{state=safeState(v);pendingCurrencyDelete=null;ensureTier();currentGear();save();render()}};
+  ensureTier();currentGear();save();render();
+  setInterval(()=>{if(lastWeekly!==weekId()){lastWeekly=weekId();render()}else if(activeTab==='overview')renderResetClock()},60000);
+})();
+</script>
+
+
+<script>
+/* Eorzea Checklist — Adventurer configuration + checklists, v3. Fully local, no API */
+(()=>{
+'use strict';
+const KEY='eorzea-adventurer-v3', H=3600000, DAY=86400000, WEEK=7*DAY;
+const DEFAULT_EXPANDED=new Set(['dailyHunts','societies','roulettes','weeklyHunts']);
+const THEMES=['dark','pink','blue','green','yellow','lilac','light'];
+const THEME_LABELS={dark:'Dark',pink:'Pink',blue:'Blue',green:'Green',yellow:'Yellow',lilac:'Purple / Lilac',light:'Light'};
+function applyTheme(){document.documentElement.dataset.theme=THEMES.includes(state.theme)?state.theme:'dark';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',state.theme==='light'?'#f7f5f1':state.theme==='pink'?'#221626':state.theme==='green'?'#12241e':state.theme==='blue'?'#102239':state.theme==='yellow'?'#271f16':state.theme==='lilac'?'#20172e':'#111927');}
+const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const EXP=['A Realm Reborn','Heavensward','Stormblood','Shadowbringers','Endwalker','Dawntrail'];
+const SOC={
+'A Realm Reborn':['Amalj\'aa','Sylphs','Kobolds','Sahagin','Ixali'],
+'Heavensward':['Vanu Vanu','Vath','Moogles'],
+'Stormblood':['Kojin','Ananta','Namazu'],
+'Shadowbringers':['Pixies','Dwarves','Qitari'],
+'Endwalker':['Arkasodara','Loporrits','Omicrons'],
+'Dawntrail':['Pelupelu','Yok Huy','Mamool Ja']};
+const CD={Heavensward:['Zhloe Aliapoh'],Stormblood:["M'naago",'Kurenai','Adkiragh'],Shadowbringers:['Kai-Shirr','Ehll Tou','Count Charlemend'],Endwalker:['Ameliance','Anden','Margrat'],Dawntrail:['Nitowikwe','Tiisol Ja']};
+const GOAL_PRESETS=['Complete the current MSQ','Level every combat job to 100','Unlock every Allied Society','Finish all role quests','Complete a Savage raid tier','Clear an Ultimate raid','Finish an expansion relic weapon','Collect 100 mounts','Complete every Deep Dungeon solo','Finish the Dawntrail sightseeing log'];
+const ROULETTES=['Expert','High-level Dungeons','Leveling','Trials','Main Scenario','Alliance Raids','Normal Raids','Mentor','Guildhests','Frontline','Level Cap Dungeons'];
+const CHALLENGES={
+ 'Battles':['Feeling Lucky','Dungeon Master',"You’re the Hest Around I","You’re the Hest Around II",'Exercising the Right','Bosom Buddies I','Bosom Buddies II','Tails of Derring-do'],
+ 'PvP':['A Wolf in Your Belly','Thrown to the Wolves','Line Up','In the Line of Fire','Prepare to Dice','Luck Be a Lady Tonight'],
+ 'FATE':['In Your FATE I','In Your FATE II'],
+ 'Levequests':['Just Leve It to Me','Making Like a Tree'],
+ 'Crafting & Gathering':['Craft Up a Storm (30 items)','Craft Up a Storm (HQ)','My Big Break','The Gathering Storm','A Boon from Nature','Hooked on the Reeling','Catch of the Day','Spear Me','Spear No Effort','The Customer Is Always Right'],
+ 'Treasure Hunt':['X Marks the Spot','Find Your Treasure and Have It Too','Aqua Gleam Hunter Force I'],
+ 'Allied Society Quests':['Improving Society Somewhat I','Improving Society Somewhat II'],
+ 'Grand Company':["Give ’Em What They Want","Give ’Em What They Want II",'Master and Commander'],
+ 'Retainer Ventures':['Venture Capital','Venture Bothers'],
+ 'The Gold Saucer':["Size Doesn’t Matter",'From Small Things','Open the Gates','Close the Gates','To the Races I','To the Races II','Victory Lap I','Victory Lap II','Always in Threes','A Winner Is You','Cards in the Hall','Triple Tumble',"Come on in, It’s Open",'Come Play Lord I','Come Play Lord II','Come Play Lord III','Kiwami'],
+ 'Field Operations':['Occult Interloping I','Occult Interloping II','Critically Endangered I','Critically Endangered II','Fateful Contention I','Fateful Contention II','Make It Chain I','Make It Chain II','Forbidden Ice, Forbidden Lightning I','Forbidden Ice, Forbidden Lightning II','Forbidden Fire, Forbidden Earth I','Forbidden Fire, Forbidden Earth II','Forbidden Water, Forbidden Wind I','Forbidden Water, Forbidden Wind II','Forbidden Bone, Forbidden Ash I','Forbidden Bone, Forbidden Ash II','Forbidden Elements I','Forbidden Elements II'],
+ 'Deep Dungeons':['Take Me to Church I','Take Me to Church II','Take Me to Church III','Take Me to Church IV','Take Me to Church V'],
+ 'Beastmaster':['Soul Survivor I','Soul Survivor II','Soul Survivor III','Master Class I','Master Class II'],
+ 'Island Sanctuary':['Living off the Land','Making a Living off the Land'],
+ 'Overall Completion':['Up for a Challenge I','Up for a Challenge II','Up for a Challenge III','Up for a Challenge IV','Up for a Challenge V']};
+const REWARDS={
+ 'Mounts':['Alexandrian Axe Beak Horn · 600','Dynamite Whistle · 600','Eggeater Horn · 600','Venturous Kamuy Flute · 600','Sabotender de la Luna Whistle · 600','Magicked Children’s Bed · 600','Wondrous Lanner Whistle · 600','Troll Horn · 600','Calydontis Horn · 600','Incitatus Whistle · 250','Ixion Clarion · 300'],
+ 'Minions':['Rroneek Calf · 400','Tin Soldier S3 · 400','Kydonia Strolls · 400','Chimpanzee · 400','Corgi · 400','Pterosquirrel · 400','Anteater · 150','Sand Fox · 150'],
+ 'Cosmetics / misc':['Tamamo Headband · 250','Cait Sith Neck Ribbon · 350','Alpaca Neck Warmer · 350','Todoroki Orchestrion Roll · 400','Sunset Orchestrion Roll · 400','Fantastic Faux Framer’s Kit · 600']};
+// A specific gathering node and a verified nearby teleporter, not a claim that every spawn uses this route.
+const MAPS=[
+ {id:'garg',name:'Gargantuaskin',lv:100,party:8,node:'Living Memory — Heatwells (X:35, Y:18), Lv. 100 rocky outcrop',tele:'Leynode Pyro',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Gargantuaskin_Map'},
+ {id:'braax',name:"Br’aaxskin",lv:100,party:8,node:'Yak T’el — Iq Rrax Tsoly (X:29.1, Y:5.1), Lv. 100 lush vegetation',tele:'Iq Br’aax (nearest from this zone’s aetherytes; flying recommended)',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Br%27aaxskin_Map'},
+ {id:'lobo',name:'Loboskin',lv:100,party:1,node:'Yak T’el — Iq Rrax Tsoly (X:29.1, Y:5.1), Lv. 100 lush vegetation',tele:'Iq Br’aax (flying recommended)',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Loboskin_Map'},
+ {id:'ophi',name:'Ophiotauroskin',lv:90,party:8,node:'Elpis — Hungering Gardens (X:24.6, Y:9.8), Lv. 90 mineral deposit',tele:'Anagnorisis (verify route in your map)',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Ophiotauroskin_Map'},
+ {id:'kumb',name:'Kumbhiraskin',lv:90,party:8,node:'Level 90 Endwalker gathering nodes; check your Gathering Log for a nearby node',tele:'Choose a convenient Endwalker aetheryte',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Kumbhiraskin_Map'},
+ {id:'saiga',name:'Saigaskin',lv:90,party:1,node:'Level 90 Endwalker gathering nodes; check your Gathering Log',tele:'Choose a convenient Endwalker aetheryte',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Saigaskin_Map'},
+ {id:'zonure',name:'Zonureskin',lv:80,party:8,node:'Level 80 Shadowbringers gathering nodes; check your Gathering Log',tele:'Choose a convenient Shadowbringers aetheryte',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Zonureskin_Map'},
+ {id:'glider',name:'Gliderskin',lv:80,party:1,node:'Level 80 Shadowbringers gathering nodes; check your Gathering Log',tele:'Choose a convenient Shadowbringers aetheryte',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Gliderskin_Map'},
+ {id:'gazelle',name:'Gazelleskin',lv:70,party:8,node:'The Lochs — High Bank (X:11.4, Y:16.6), Lv. 70 mineral deposit',tele:'Porta Praetoria (verify route in your map)',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Gazelleskin_Map'},
+ {id:'dragon',name:'Dragonskin',lv:60,party:8,node:'Level 60 Heavensward gathering nodes; check your Gathering Log',tele:'Choose a convenient Heavensward aetheryte',link:'https://ffxiv.consolegameswiki.com/wiki/Timeworn_Dragonskin_Map'}];
+const detailOpen={config:Object.create(null),checklist:Object.create(null)};
+function captureDetailState(container,which){for(const el of container.querySelectorAll('details[data-adv-detail-key]')) detailOpen[which][el.dataset.advDetailKey]=el.open;}
+const PANELS=[
+ {id:'dailyHunts',group:'daily',title:'Daily hunt marks',glyph:'🎯',hint:'Select expansions and tick off each hunt bill.',list:()=>EXP},
+ {id:'societies',group:'daily',title:'Allied society quests',glyph:'🤝',hint:'Choose your societies; each gets its own daily checkbox.',list:()=>Object.values(SOC).flat()},
+ {id:'maps',group:'daily',title:'Treasure map allowance',glyph:'🗺️',hint:'Choose a map and see a suggested gathering route.',single:true},
+ {id:'roulettes',group:'daily',title:'Duty roulettes',glyph:'⚔️',hint:'Only your selected roulettes appear.',list:()=>ROULETTES},
+ {id:'mini',group:'daily',title:'Mini Cactpot',glyph:'🎟️',hint:'Three tickets available daily.',single:true},
+ {id:'weeklyHunts',group:'weekly',title:'Weekly hunt marks',glyph:'🏹',hint:'Elite B-rank bills, tracked by expansion.',list:()=>EXP},
+ {id:'challenges',group:'weekly',title:'Challenge Log',glyph:'📜',hint:'Expand a category to select and clear individual objectives.',list:()=>Object.values(CHALLENGES).flat()},
+ {id:'deliveries',group:'weekly',title:'Custom deliveries',glyph:'📦',hint:'Pick clients to focus on; 12 allowances per week (6 per client).',list:()=>Object.values(CD).flat()},
+ {id:'tails',group:'weekly',title:'Wondrous Tails',glyph:'📖',hint:'Set the expiry shown in your own journal.',single:true},
+ {id:'fashion',group:'weekly',title:'Fashion Report',glyph:'✨',hint:'Current-week community infographic link.',single:true},
+ {id:'jumbo',group:'weekly',title:'Jumbo Cactpot',glyph:'🎰',hint:'Draw and Early Bird bonus depend on your data centre.',single:true},
+ {id:'tomes',group:'weekly',title:'Tomestone cap',glyph:'💎',hint:'Detailed balance in Raid Tracker',single:true},
+ {id:'faux',group:'weekly',title:'Faux Hollows',glyph:'🦊',hint:'Tell, optional Retell and a permanent rewards wishlist.',list:()=>['Tell','Retell']},
+ {id:'goals',group:'goal',title:'One-time goals',glyph:'🌟',hint:'Pick long-term achievements that never reset, or add your own custom goals.',list:()=>GOAL_PRESETS}
+];
+const DEFS={dailyHunts:['Dawntrail'],societies:['Pelupelu','Yok Huy','Mamool Ja'],roulettes:['Expert','Leveling','Frontline'],weeklyHunts:['Dawntrail'],challenges:['Feeling Lucky','Dungeon Master','Open the Gates'],deliveries:['Nitowikwe','Tiisol Ja'],faux:['Tell','Retell']};
+const ENABLE={dailyHunts:true,societies:true,maps:true,roulettes:true,mini:true,weeklyHunts:true,challenges:true,deliveries:true,tails:true,fashion:true,jumbo:true,tomes:true,faux:true,goals:true};
+function fresh(){return {enabled:{...ENABLE},selections:structuredClone(DEFS),completion:{},map:'garg',mapGatheredAt:0,dc:'Materia',timeZone:'auto',wtExpiry:'',rewards:[],obtained:[],expanded:{},configExpanded:{},configTab:'daily',dailyTab:'daily',theme:'dark',sections:{daily:true,weekly:true}}}
+function clean(v){const base=fresh();if(!v||typeof v!=='object')return base;
+ for(const id of Object.keys(ENABLE))base.enabled[id]=v.enabled?.[id]!==false;
+ for(const p of PANELS.filter(x=>x.list)){const allowed=new Set(p.list());const values=v.selections?.[p.id];if(Array.isArray(values))base.selections[p.id]=[...new Set(values.filter(x=>typeof x==='string'&&allowed.has(x)))];}
+ if(v.completion&&typeof v.completion==='object'&&!Array.isArray(v.completion)){for(const [k,x] of Object.entries(v.completion).slice(0,1500)){if(k.length<200&&typeof x==='string'&&x.length<100)base.completion[k]=x}}
+ if(MAPS.some(m=>m.id===v.map))base.map=v.map;
+ if(Number.isFinite(v.mapGatheredAt)&&v.mapGatheredAt>0)base.mapGatheredAt=v.mapGatheredAt;
+ if(['Materia','JP','EU','NA'].includes(v.dc))base.dc=v.dc;
+ if(v.timeZone==='auto'||window.EorzeaClock.valid(v.timeZone))base.timeZone=v.timeZone;
+ if(THEMES.includes(v.theme))base.theme=v.theme;
+ for(const k of ['daily','weekly'])if(typeof v.sections?.[k]==='boolean')base.sections[k]=v.sections[k];
+ if(typeof v.wtExpiry==='string'&& /^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(v.wtExpiry))base.wtExpiry=v.wtExpiry;
+ for(const k of ['expanded','configExpanded'])if(v[k]&&typeof v[k]==='object'){for(const [id,val] of Object.entries(v[k]))if(PANELS.some(p=>p.id===id)&&typeof val==='boolean')base[k][id]=val}
+ for(const k of ['rewards','obtained'])if(Array.isArray(v[k]))base[k]=[...new Set(v[k].filter(x=>typeof x==='string'&&x.length<140))].slice(0,100);
+ return base}
+function load(){try{const x=localStorage.getItem(KEY);return x?clean(JSON.parse(x)):fresh()}catch(e){console.warn('Adventurer configuration could not be loaded',e);return fresh()}}
+let state=load(), view='checklist', lastCycles='';
+applyTheme();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){console.warn('Unable to save Adventurer settings',e)}}
+function cycle(f){const now=Date.now(),d=new Date(now);let t=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate(),15);if(f==='weekly'){const offset=(d.getUTCDay()-2+7)%7;t=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()-offset,8);if(t>now)t-=WEEK}else if(t>now)t-=DAY;return new Date(t).toISOString()}
+function allActive(p){return p.single?[p.id]:state.selections[p.id]??[]}
+function key(p,s){return p.id+'|'+s}
+function done(p,s){if(p.id==='maps')return state.mapGatheredAt>0&&Date.now()-state.mapGatheredAt<18*H;
+ if(p.group==='goal')return state.completion[key(p,s)]==='forever';
+ return state.completion[key(p,s)]===cycle(p.group)}
+function setDone(p,s,value){if(p.id==='maps'){state.mapGatheredAt=value?Date.now():0}
+ else if(value)state.completion[key(p,s)]=p.group==='goal'?'forever':cycle(p.group);else delete state.completion[key(p,s)];save();renderChecklist()}
+function selected(p,s){return(state.selections[p.id]||[]).includes(s)}
+function toggleSelection(p,s,on){const cur=state.selections[p.id]||[];state.selections[p.id]=on?[...new Set([...cur,s])]:cur.filter(x=>x!==s);save();renderConfig();renderChecklist()}
+const timeago=ms=>{const sec=Math.max(0,Math.ceil(ms/1000));const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60);return (d?d+'d ':'')+h+'h '+m+'m'};
+function nextJumbo(){const utcDay={Materia:6,JP:6,EU:6,NA:0}[state.dc];const utcHour={Materia:9,JP:12,EU:19,NA:2}[state.dc];const d=new Date(),days=(utcDay-d.getUTCDay()+7)%7;let t=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+days,utcHour);if(t<=Date.now())t+=WEEK;return t}
+function jumboStatus(){const next=nextJumbo(),prev=next-WEEK,fmt=d=>window.EorzeaClock.format(d,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}),finish=d=>window.EorzeaClock.format(d,{hour:'numeric',minute:'2-digit',timeZoneName:'short'});return {text:`Next draw: ${fmt(next)} · in ${timeago(next-Date.now())}`,early:Date.now()<prev+H&&Date.now()>=prev?`Early Bird is open · ${timeago(prev+H-Date.now())} left`:`Next Early Bird window: ${fmt(next)}–${finish(next+H)}`}}
+function mapLabel(){const remaining=18*H-(Date.now()-state.mapGatheredAt);return state.mapGatheredAt>0&&remaining>0?'Next allowance in '+timeago(remaining):'Now available'}
+function info(p){const map=MAPS.find(m=>m.id===state.map)||MAPS[0];if(p.id==='maps')return `<div class="adv-route">Selected: <strong>${esc(map.name)} · Lv ${map.lv} · ${map.party===1?'Solo':'8-player party'}</strong><div>Sample node: ${esc(map.node)}</div><div>Suggested teleport: <strong>${esc(map.tele)}</strong></div><a href="${map.link}" target="_blank" rel="noopener noreferrer">Gathering nodes ↗</a><div class="adv-small">*Available every 18 real life hours.</div><div class="adv-small">Teleport recommendation is for this sample gathering node.</div><div class="adv-timer" data-adv-timer="map">${mapLabel()}</div></div>`;
+ if(p.id==='tails')return `<div class="adv-inline"><label>Journal expiry (your local date/time) <input class="adv-input" aria-label="Wondrous Tails journal expiry" type="datetime-local" data-adv-setting="wtExpiry" value="${esc(state.wtExpiry)}"></label></div><div class="adv-small" data-adv-timer="tails">${tailsLabel()}</div>`;
+ if(p.id==='jumbo'){const j=jumboStatus();return `<div class="adv-inline"><label>Data centre <select class="adv-select" data-adv-setting="dc">${[['Materia','OCE / Materia'],['JP','Japan'],['EU','Europe'],['NA','North America']].map(([id,n])=>`<option value="${id}" ${state.dc===id?'selected':''}>${n}</option>`).join('')}</select></label></div><div class="adv-timer" data-adv-timer="jumbo">${esc(j.text)}</div><div class="adv-small">${esc(j.early)}</div>`}
+ if(p.id==='fashion')return `<p class="adv-subnote"><a href="https://www.reddit.com/r/ffxiv/search/?q=Fashion%20Report%20Full%20Details&restrict_sr=1&sort=new" target="_blank" rel="noopener noreferrer">This week's Fashion Report ↗</a><br><span class="adv-small">via Reddit</span></p>`;
+ if(p.id==='faux')return `<div class="adv-route"><strong>Faux Commander wishlist</strong> · Idyllshire (X:5.7, Y:6.1). <a href="https://ffxiv.consolegameswiki.com/wiki/Faux_Leaf" target="_blank" rel="noopener noreferrer">Vendor rewards ↗</a><div class="adv-small">Unlock a Retell by revealing the large illustration; only one Retell can be earned per week.</div><div class="adv-inline"><label>Faux Leaves wishlist</label></div>${wishlist(false)}</div>`;
+ if(p.id==='goals')return `<p class="adv-subnote">Pick preset goals here, or use <b>＋ New task</b> and choose <b>One-time goal</b> to create your own. Both remain permanently complete unless you uncheck them.</p>`;
+ if(p.id==='challenges')return `<div class="adv-small"><a href="https://ffxiv.consolegameswiki.com/wiki/Challenge_Log" target="_blank" rel="noopener noreferrer">See requirements for each Challenge Log entry ↗</a></div>`;
+ return ''}
+function tailsLabel(){if(!state.wtExpiry)return 'Enter the expiration printed in your in-game journal. Each journal is valid for two weekly cycles from its issue week.';
+ const ms=new Date(state.wtExpiry).getTime()-Date.now();return ms>0?'Journal expires in '+timeago(ms):'Journal expired. Pick up a new journal and enter its date.'}
+function checklistCheck(p,s,label=s){const checked=done(p,s);return `<label class="adv-checkbox ${checked?'is-checked':''}"><input type="checkbox" data-adv-done="${esc(p.id)}" data-adv-entry="${esc(s)}" ${checked?'checked':''}><span>${esc(label)}</span></label>`}
+function configCheck(p,s){const checked=selected(p,s);return `<label class="adv-checkbox ${checked?'is-checked':''}"><input type="checkbox" data-adv-pick="${esc(p.id)}" data-adv-entry="${esc(s)}" ${checked?'checked':''}><span>${esc(s)}</span></label>`}
+function groupedPeople(p,data,config){return Object.entries(data).map(([ex,names])=>`<div><div class="adv-count">${esc(ex)}</div><div class="adv-checkgrid">${names.map(s=>config?configCheck(p,s):checklistCheck(p,s)).join('')}</div></div>`).join('')}
+function categoryGrid(config){const p=PANELS.find(x=>x.id==='challenges');return Object.entries(CHALLENGES).map(([name,entries])=>{
+ const picks=entries.filter(s=>selected(p,s));if(!config&&!picks.length)return '';
+ const all=config&&picks.length===entries.length;
+ return `<details class="adv-category" data-adv-detail-key="challenge:${esc(name)}" ${detailOpen[config?'config':'checklist']['challenge:'+name]?'open':''}><summary><span class="adv-category-name">${esc(name)}</span><span class="adv-chip">${config?picks.length: picks.filter(s=>done(p,s)).length} / ${config?entries.length:picks.length}</span></summary><div class="adv-tools" style="padding:0 10px 8px"><button class="btn small ghost" type="button" data-adv-bulk="${config?'pick':'done'}" data-adv-category="${esc(name)}" data-adv-mode="all">${config?'Select all':'Mark all done'}</button><button class="btn small ghost" type="button" data-adv-bulk="${config?'pick':'done'}" data-adv-category="${esc(name)}" data-adv-mode="none">${config?'Clear selection':'Undo all'}</button></div><div class="adv-checkgrid">${(config?entries:picks).map(s=>config?configCheck(p,s):checklistCheck(p,s)).join('')}</div></details>`}).join('')}
+function wishlist(config){const all=Object.values(REWARDS).flat();return Object.entries(REWARDS).map(([group,entries])=>`<details class="adv-category" data-adv-detail-key="reward:${esc(group)}" ${detailOpen[config?'config':'checklist']['reward:'+group]?'open':''}><summary><span class="adv-category-name">${esc(group)}</span><span class="adv-chip">${entries.filter(x=>(config?state.rewards:state.obtained).includes(x)).length} / ${config?entries.length:entries.filter(x=>state.rewards.includes(x)).length}</span></summary><div class="adv-checkgrid">${entries.filter(x=>config||state.rewards.includes(x)).map(s=>{const checked=(config?state.rewards:state.obtained).includes(s);return `<label class="adv-checkbox ${checked?'is-checked':''}"><input type="checkbox" data-adv-reward="${config?'pick':'obtained'}" data-adv-entry="${esc(s)}" ${checked?'checked':''}><span>${esc(s)}</span></label>`}).join('')}</div></details>`).join('')}
+function renderPanel(p,config){const enabled=state.enabled[p.id], entries=allActive(p),doneCount=entries.filter(s=>done(p,s)).length;
+ if(!config&&!enabled)return '';
+ if(!config&&p.list&&!entries.length)return '';
+ const expanded=config?(state.configExpanded[p.id]===true):(state.expanded[p.id]===true||(state.expanded[p.id]===undefined&&DEFAULT_EXPANDED.has(p.id)));
+ let inner='';
+ if(config){
+  if(p.id==='societies')inner=groupedPeople(p,SOC,true);
+  else if(p.id==='deliveries')inner=groupedPeople(p,CD,true);
+  else if(p.id==='challenges')inner=`<div class="adv-tools"><span class="adv-small">Configure all Challenge Log categories</span><span><button class="btn small ghost" type="button" data-adv-bulk="pick" data-adv-category="__all__" data-adv-mode="all">Select all</button> <button class="btn small ghost" type="button" data-adv-bulk="pick" data-adv-category="__all__" data-adv-mode="none">Clear all</button></span></div>`+categoryGrid(true)+info(p);
+  else if(p.id==='faux')inner=`<div class="adv-checkgrid">${(p.list?.()||[]).map(s=>configCheck(p,s)).join('')}</div><div class="adv-count">Vendor rewards to keep an eye on</div>${wishlist(true)}`;
+  else if(p.id==='maps')inner=`<label class="adv-small" for="mapOption">Choose your map type</label><div class="adv-inline"><select id="mapOption" class="adv-select" data-adv-setting="map">${MAPS.map(m=>`<option value="${m.id}" ${state.map===m.id?'selected':''}>${esc(m.name)} · Lv ${m.lv} · ${m.party===1?'Solo':'8 players'}</option>`).join('')}</select></div>${info(p)}`;
+  else if(p.list)inner=`<div class="adv-checkgrid ${p.id==='roulettes'?'adv-roulette-list':''}">${p.list().map(s=>configCheck(p,s)).join('')}</div>`+(p.id==='goals'?info(p):'');
+  else if(['tails','jumbo','fashion'].includes(p.id))inner=info(p);
+  else if(p.id==='goals')inner=info(p);
+  else inner=`<p class="adv-subnote">No extra configuration needed.</p>`;
+ }else{
+  if(p.id==='societies')inner=groupedPeople(p,Object.fromEntries(Object.entries(SOC).map(([ex,arr])=>[ex,arr.filter(s=>selected(p,s))]).filter(([,arr])=>arr.length)),false);
+  else if(p.id==='deliveries')inner=groupedPeople(p,Object.fromEntries(Object.entries(CD).map(([ex,arr])=>[ex,arr.filter(s=>selected(p,s))]).filter(([,arr])=>arr.length)),false);
+  else if(p.id==='challenges')inner=`<div class="adv-tools"><span class="adv-small">Mark all your selected Challenge Log objectives</span><span><button class="btn small ghost" type="button" data-adv-bulk="done" data-adv-category="__all__" data-adv-mode="all">All done</button> <button class="btn small ghost" type="button" data-adv-bulk="done" data-adv-category="__all__" data-adv-mode="none">Undo all</button></span></div>`+categoryGrid(false)+info(p);
+  else if(p.id==='faux')inner=`<div class="adv-checkgrid">${entries.map(s=>checklistCheck(p,s)).join('')}</div>${info(p)}`;
+  else if(p.list)inner=`<div class="adv-checkgrid ${p.id==='roulettes'?'adv-roulette-list':''}">${entries.map(s=>checklistCheck(p,s)).join('')}</div>`;
+  else inner=`<div class="adv-checkgrid">${checklistCheck(p,p.id,p.id==='maps'?'Gathered map':p.id==='tails'?'Journal handed in':p.id==='fashion'?'Judged Fashion Report':p.id==='jumbo'?'Claimed Jumbo Cactpot / bought tickets':p.id==='tomes'?'Weekly cap reached':p.id==='mini'?'Mini Cactpot completed': 'Completed')}</div>${info(p)}`;
+ }
+ // Prominent single completion checkbox; grouped panels only use child checks.
+ const badge=config?(p.list?`${(state.selections[p.id]||[]).length} chosen`:'Click to customise'):`${doneCount} / ${entries.length} complete`;
+ const showButton=!!(p.list||p.id==='faux'||(config&&['maps','tails','jumbo','fashion','goals'].includes(p.id)));
+ return `<article class="adv-tile ${!config&&entries.length&&doneCount===entries.length?'adv-complete':''}"><div class="adv-tile-header"><div class="adv-tile-headline"><div class="adv-glyph">${p.glyph}</div><div><h3>${esc(p.title)}</h3><p>${esc(badge)}</p></div></div>${config?`<label class="adv-toggle"><input aria-label="Show ${esc(p.title)} on checklist" type="checkbox" data-adv-enabled="${p.id}" ${enabled?'checked':''}> Show</label>`:showButton?`<button class="adv-expand" type="button" data-adv-expand="${p.id}" data-adv-place="checklist" aria-label="${expanded?'Collapse':'Expand'} ${esc(p.title)}" aria-expanded="${expanded}">${expanded?'−':'+'}</button>`:''}${config&&showButton?`<button class="adv-expand" type="button" data-adv-expand="${p.id}" data-adv-place="config" aria-label="${expanded?'Collapse':'Expand'} ${esc(p.title)}" aria-expanded="${expanded}">${expanded?'−':'+'}</button>`:''}</div><div class="adv-small" style="margin-top:8px">${esc(p.hint)}</div>${config?expanded?`<div class="adv-collapse">${inner}</div>`:'':p.list||p.id==='faux'?expanded?`<div class="adv-collapse">${inner}</div>`:`<div class="adv-count">${entries.filter(s=>done(p,s)).length} of ${entries.length} ✓</div>`:p.id==='maps'?`<div class="adv-collapse">${checklistCheck(p,p.id,'Gathered map')}${info(p)}</div>`:p.id==='tails'||p.id==='jumbo'?`<div class="adv-collapse">${checklistCheck(p,p.id,p.id==='tails'?'Journal handed in':'Claimed / bought tickets')}${info(p)}</div>`:p.id==='fashion'?`<div class="adv-collapse">${checklistCheck(p,p.id,'Fashion Report judged')}${info(p)}</div>`:`<div class="adv-collapse">${inner}</div>`}</article>`;
+}
+function updateProgress(){
+ const personal=window.EorzeaTasks?.getCounts?.()||{};
+ for(const group of ['daily','weekly','goal']){
+   let total=personal[group]?.total||0,completed=personal[group]?.done||0;
+   for(const p of PANELS.filter(x=>x.group===group&&state.enabled[x.id])){
+     const entries=allActive(p);total+=entries.length;completed+=entries.filter(s=>done(p,s)).length;
+   }
+   const counter=$(group+'Progress'),bar=$(group+'Bar');if(counter)counter.textContent=completed+' / '+total;if(bar)bar.style.width=(total?completed/total*100:0)+'%';
+ }
+}
+function renderChecklist(){const cont=$('adventurerBoard');if(!cont)return;captureDetailState(cont,'checklist');let total=0,completed=0,summary='';for(const group of ['daily','weekly']){let html='';for(const p of PANELS.filter(x=>x.group===group&&state.enabled[x.id]&&(!x.list||allActive(x).length))){const entries=allActive(p);total+=entries.length;completed+=entries.filter(s=>done(p,s)).length;html+=renderPanel(p,false)}const isExpanded=state.sections[group]!==false;summary+=`<section class="adv-task-section"><div class="adv-section-title adv-section-toggle"><h3>${group==='daily'?'☀ Daily adventures':'☾ Weekly pursuits'}</h3><button class="adv-section-button" type="button" data-adv-section="${group}" aria-expanded="${isExpanded}" aria-controls="adv-${group}-grid" aria-label="${isExpanded?'Collapse':'Expand'} ${group} tasks">${isExpanded?'−':'+'}</button></div><div class="adv-grid" id="adv-${group}-grid" ${isExpanded?'':'hidden'}>${html||'<div class="adv-empty">No tasks chosen. Visit Config to enable some.</div>'}</div></section>`}
+ if(state.enabled.goals&&(state.selections.goals||[]).length){const p=PANELS.find(x=>x.id==='goals'),entries=allActive(p);total+=entries.length;completed+=entries.filter(s=>done(p,s)).length;summary+=`<div class="adv-section-title">✧ One-time pursuits</div><div class="adv-grid">${renderPanel(p,false)}</div>`;}
+ cont.innerHTML=`<div class="adv-header"><div><div class="eyebrow">Choose your adventures</div><h2>To Do List</h2><p>Only the activities you've selected appear here. Each expansion, society, roulette and challenge has its own checkbox.</p></div></div><div class="adv-badges"><span class="adv-badge">${completed} / ${total} selected activities complete</span><span class="adv-badge">Daily reset · ${window.EorzeaClock.format(Date.parse(cycle('daily'))+DAY,{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'})}</span><span class="adv-badge">Weekly reset · ${window.EorzeaClock.format(Date.parse(cycle('weekly'))+WEEK,{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'})}</span></div>${summary}<div class="adv-board"><div class="adv-tools"><div><h3 style="margin:0">Personal tasks</h3><p class="adv-small" style="margin:4px 0 0">Your existing custom daily, weekly, and one-time tasks appear here.</p></div><button class="btn small" id="advAddTask" type="button">＋ New task</button></div><div id="personalTasks" aria-live="polite"></div></div>`;
+ window.EorzeaTasks?.renderPersonal?.();updateProgress();
+ $('advAddTask')?.addEventListener('click',()=>$('addBtn').click());
+}
+function timeZoneOptions(){
+ const preferred=['Australia/Sydney','Australia/Melbourne','Australia/Brisbane','Australia/Adelaide','Australia/Perth','Australia/Hobart','Australia/Darwin','Pacific/Auckland','Asia/Tokyo','Asia/Singapore','Europe/London','America/New_York','America/Los_Angeles','UTC'];
+ const zones=[...new Set([...preferred,...(Intl.supportedValuesOf?.('timeZone')||[])])];
+ const offset=z=>{try{return new Intl.DateTimeFormat('en',{timeZone:z,timeZoneName:'shortOffset',hour:'numeric'}).formatToParts(new Date()).find(x=>x.type==='timeZoneName')?.value||''}catch{return ''}};
+ return `<option value="auto" ${state.timeZone==='auto'?'selected':''}>Device timezone (automatic: ${esc(window.EorzeaClock.zoneName())})</option>`+zones.map((z,i)=>`<option value="${esc(z)}" ${state.timeZone===z?'selected':''}>${i===0?'── Common time zones ──  ':i===preferred.length?'── Other time zones ──  ':''}${esc(z.replaceAll('_',' '))} (${esc(offset(z))})</option>`).join('');
+}
+function renderConfig(){const cont=$('adventurerConfig');if(!cont)return;captureDetailState(cont,'config');cont.innerHTML=`<div class="adv-header"><div><div class="eyebrow">Personalise the journal</div><h2>Config</h2><p>Switch on the categories you care about. Expand each tile to select its specific activities. Your choices stay saved between visits.</p></div><button class="btn primary" type="button" id="configReturn">✓ Return to checklist</button></div><section class="adv-theme-settings"><h3>🎨 Customise appearance</h3><p class="adv-small">Choose a colour theme for your entire tracker. Your preference is saved locally and included in backups.</p><div class="adv-theme-grid" role="group" aria-label="Colour theme">${THEMES.map(t=>`<button type="button" class="adv-theme-option ${state.theme===t?'active':''}" data-adv-theme="${t}" aria-pressed="${state.theme===t}"><span class="adv-theme-swatch theme-${t}" aria-hidden="true"><span></span><i></i></span><span class="adv-theme-name">${THEME_LABELS[t]}</span>${state.theme===t?'<span class="adv-theme-current">✓ Selected</span>':''}</button>`).join('')}</div></section><div class="adv-time-settings"><h3>🕒 Time zone</h3><label for="advTimeZone">Display dates and times in</label><select id="advTimeZone" class="adv-select" data-adv-setting="timeZone">${timeZoneOptions()}</select><p class="adv-small">Current display: ${esc(window.EorzeaClock.zoneName())}. Game resets stay fixed at 15:00 UTC daily and Tuesday 08:00 UTC weekly; only the time shown changes (including daylight saving).</p></div><div class="inline-note">Checkboxes on this page choose <b>what appears</b> in your checklist; completion checkboxes live on the To Do List. Your choices do not reset when the game does.</div>${['daily','weekly','goal'].map(group=>`<div class="adv-section-title">${group==='daily'?'☀ Daily tasks':group==='weekly'?'☾ Weekly tasks':'✧ One-time tasks'}</div><div class="adv-grid">${PANELS.filter(p=>p.group===group).map(p=>renderPanel(p,true)).join('')}</div>`).join('')}<div class="adv-board"><h3 style="margin:0 0 6px">Data & local saves</h3><p class="adv-small">Settings and completions are saved to this browser and included in the global Backup / Restore. Selecting another expansion does not erase the previous expansion's progress for its active reset cycle.</p></div>`;
+ $('configReturn')?.addEventListener('click',()=>switchView('checklist'));
+}
+function switchView(name){view=name;['checklist','endgame','config','glam'].forEach(k=>{const n=$(k+'View');if(n)n.classList.toggle('hidden',k!==name)});document.querySelectorAll('[data-main-view]').forEach(b=>{const selected=b.dataset.mainView===name;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected))});if(name==='checklist')renderChecklist();if(name==='config')renderConfig();}
+document.querySelectorAll('[data-main-view]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mainView==='config')switchView('config');else if(b.dataset.mainView==='checklist')switchView('checklist')}));
+// Reuse existing Raid HQ's navigation callback for raid view; its own handler already renders the raid panel.
+function handleChange(e){const t=e.target,p=PANELS.find(x=>x.id===(t.dataset.advPick||t.dataset.advDone||t.dataset.advEnabled));if(t.dataset.advEnabled){state.enabled[t.dataset.advEnabled]=t.checked;save();renderConfig();renderChecklist();return}
+ if(t.dataset.advPick&&p){toggleSelection(p,t.dataset.advEntry,t.checked);return}
+ if(t.dataset.advDone&&p){setDone(p,t.dataset.advEntry,t.checked);return}
+ if(t.dataset.advSetting){const k=t.dataset.advSetting; if(k==='map'&&MAPS.some(m=>m.id===t.value)){state.map=t.value}else if(k==='timeZone'&&(t.value==='auto'||window.EorzeaClock.valid(t.value))){state.timeZone=t.value}else if(k==='dc'&&['Materia','JP','EU','NA'].includes(t.value))state.dc=t.value;else if(k==='wtExpiry')state.wtExpiry=t.value;save();renderConfig();renderChecklist();if(k==='timeZone'){window.EorzeaTasks?.refresh?.();window.EorzeaRaid?.refresh?.()}return}
+ if(t.dataset.advReward){const k=t.dataset.advReward==='pick'?'rewards':'obtained';state[k]=t.checked?[...new Set([...state[k],t.dataset.advEntry])]:state[k].filter(x=>x!==t.dataset.advEntry);save();renderConfig();renderChecklist();return}}
+function handleClick(e){const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.advTheme&&THEMES.includes(b.dataset.advTheme)){state.theme=b.dataset.advTheme;save();applyTheme();renderConfig();return}
+ if(b.dataset.advSection&&['daily','weekly'].includes(b.dataset.advSection)){const k=b.dataset.advSection;state.sections[k]=state.sections[k]===false;save();renderChecklist();return}
+ if(b.dataset.advExpand){const k=b.dataset.advPlace==='config'?'configExpanded':'expanded',p=b.dataset.advExpand;state[k][p]=!(state[k][p]===true||(k==='expanded'&&state[k][p]===undefined&&DEFAULT_EXPANDED.has(p)));save();if(k==='configExpanded')renderConfig();else renderChecklist();return}
+ if(b.dataset.advBulk){const p=PANELS.find(x=>x.id==='challenges'),entries=b.dataset.advCategory==='__all__'?Object.values(CHALLENGES).flat():CHALLENGES[b.dataset.advCategory]||[],on=b.dataset.advMode==='all';if(b.dataset.advBulk==='pick'){for(const s of entries){const a=new Set(state.selections.challenges||[]);if(on)a.add(s);else a.delete(s);state.selections.challenges=[...a]}}else{for(const s of entries.filter(s=>selected(p,s))){if(on)state.completion[key(p,s)]=cycle('weekly');else delete state.completion[key(p,s)]}}save();renderConfig();renderChecklist();return}}
+for(const root of ['adventurerBoard','adventurerConfig']){ $(root).addEventListener('change',handleChange);$(root).addEventListener('click',handleClick)}
+window.EorzeaAdventurer={updateProgress,export:()=>JSON.parse(JSON.stringify(state)),import:v=>{state=clean(v);save();applyTheme();renderConfig();renderChecklist();window.EorzeaTasks?.refresh?.();window.EorzeaRaid?.refresh?.()},show:()=>switchView('checklist')};
+// State remains isolated from the older checklist; no original task progress is overwritten.
+save();renderConfig();renderChecklist();
+let last=cycle('daily')+cycle('weekly');
+setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=now;renderChecklist()}
+ for(const n of document.querySelectorAll('[data-adv-timer]')){if(n.dataset.advTimer==='tails')n.textContent=tailsLabel();if(n.dataset.advTimer==='jumbo')n.textContent=jumboStatus().text;if(n.dataset.advTimer==='map'){const prev=n.textContent;n.textContent=mapLabel();if(prev!=='Now available'&&n.textContent==='Now available'){renderChecklist();break}}}
+},60000);
+})();
+
+</script>
+
+<script>
+/* ── Glamour Wardrobe: keyword search and external item references ─────────
+   Keeps the v5 localStorage/backup schema; old farming steps are preserved in
+   backups for compatibility but intentionally not displayed or modified. */
+(function(){'use strict';
+ const KEY='eorzea-glam-v1';
+ const $=id=>document.getElementById(id);
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);
+ const norm=s=>String(s||'').toLocaleLowerCase('en').replace(/\s+/g,' ').trim();
+ // A query term must begin an actual word. "aiming" matches "Aiming", never "Maiming".
+ // Allow typing a partial word such as "yuwe" to find "Yuweyawata".
+ const tokens=s=>(norm(s).match(/[\p{L}\p{N}]+/gu)||[]);
+ const words=s=>[...new Set(tokens(s))];
+ const matches=(name,query)=>{const nameTokens=tokens(name);return words(query).every(w=>nameTokens.some(t=>t===w||(w.length>=3&&t.startsWith(w))))};
+ // Curated examples and recognisable equipment families. No guess for unknown sets.
+ // These are quick source categories, NOT complete acquisition instructions.
+ const sources=[
+  {pattern:/^augmented ironworks magitek repeater$/i,label:'Trade for Tomestones',icon:'🪙',kind:'known'},
+  {pattern:/^abyssos helm of fending$/i,label:'Raid Gear / Trade for Tokens',icon:'⚔️',kind:'known'},
+  {pattern:/^vana.dielian surcoat(?: of .+)?$/i,label:'Alliance Raid Gear',icon:'🏰',kind:'known'},
+  {pattern:/^skyruin (?:war axe|bardiche)$/i,label:'Extreme Trial Gear / Trade for Totems',icon:'🐉',kind:'known'},
+  {pattern:/^thormoen.s purpose$/i,label:'Dungeon Gear / Retainer Ventures',icon:'🗝️',kind:'known'},
+  {pattern:/^archeo[ -]kingdom (?:mail|cuirass) of fending$/i,label:'Crafted',icon:'🛠️',kind:'known'},
+  {pattern:/^augmented ironworks\b/i,label:'Trade for Tomestones',icon:'🪙',kind:'set'},
+  {pattern:/^(?:abyssos|edenmorn|asphodelos|ascension|anabaseios)\b/i,label:'Raid Gear / Trade for Tokens',icon:'⚔️',kind:'set'},
+  {pattern:/^vana.dielian\b/i,label:'Alliance Raid Gear',icon:'🏰',kind:'set'},
+  {pattern:/^skyruin\b/i,label:'Extreme Trial Gear / Trade for Totems',icon:'🐉',kind:'set'},
+  {pattern:/^(?:archeo[ -]kingdom|rinascita)\b/i,label:'Crafted',icon:'🛠️',kind:'set'},
+  {pattern:/^yuweyawata\b/i,label:'Dungeon Gear',icon:'🗝️',kind:'set'}
+ ];
+ function sourceFor(name){const rule=sources.find(x=>x.pattern.test(String(name||'').trim()));return rule||{label:'Source not classified',icon:'🔎',kind:'unknown'}}
+ function sourceTag(name){const src=sourceFor(name);return `<span class="glam-source-tag ${src.kind==='unknown'?'unknown':''}" title="${src.kind==='known'?'Known acquisition category':src.kind==='set'?'Suggested from a known equipment set; verify the exact item':'Open Lodestone or Garland Tools for acquisition details'}">${src.icon} ${esc(src.label)}${src.kind==='set'?' <em>· set</em>':''}</span>`}
+ const itemId=n=>Number.isSafeInteger(Number(n))&&Number(n)>0&&Number(n)<10000000?Number(n):null;
+ const lodestone=name=>'https://na.finalfantasyxiv.com/lodestone/playguide/db/item/?q='+encodeURIComponent(name);
+ const garland=id=>id?'https://garlandtools.org/db/#item/'+id:'https://garlandtools.org/db/';
+ // Sanitize prior app data without deleting recorded checkmarks, notes, or old routes.
+ function cleanEntry(e){
+  if(!e||typeof e.name!=='string'||!e.name.trim())return null;
+  const previousSteps=Array.isArray(e.steps)?e.steps.slice(0,18).map(x=>typeof x==='string'?{text:x.slice(0,350),done:false}:{text:String(x?.text||'').slice(0,350),done:x?.done===true}).filter(x=>x.text.trim()):[];
+  return {
+   id:typeof e.id==='string'&&e.id?e.id.slice(0,130):uid(),
+   name:e.name.trim().slice(0,110),level:Math.max(0,Math.min(100,Number(e.level)||0)),
+   itemId:itemId(e.itemId),collected:e.collected===true,notes:String(e.notes||'').slice(0,500),
+   steps:previousSteps,group:String(e.group||'').slice(0,80),source:String(e.source||'').slice(0,180),
+   verified:e.verified===true,acquisitionStatus:String(e.acquisitionStatus||'').slice(0,25),
+   acquisitionUrl:String(e.acquisitionUrl||'').slice(0,450),acquisitionCheckedAt:Number(e.acquisitionCheckedAt)||0,
+   createdAt:Number.isFinite(e.createdAt)?e.createdAt:Date.now()
+  };
+ }
+ function sanitize(v){if(!Array.isArray(v)||v.length>500)throw Error('Invalid glamour backup');const ids=new Set();return v.map(cleanEntry).filter(Boolean).map(p=>{if(ids.has(p.id))p.id=uid();ids.add(p.id);return p})}
+ function load(){try{const text=localStorage.getItem(KEY);return text?sanitize(JSON.parse(text)):[]}catch(e){console.warn('Could not load wardrobe',e);return []}}
+ let pieces=load(),editingId='',deleteId='',results=[],seq=0,debounce=0;
+ function status(message){$('glamSearchStatus').textContent=message}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(pieces))}catch(e){status('Could not save your wardrobe locally; export a backup to protect it.')}}
+ function drawResults(found,q){
+  results=found.slice();
+  $('glamResults').innerHTML=results.map((r,i)=>`<button type="button" class="glam-result ${r.manual?'glam-manual-result':''}" data-glam-result="${i}"><span><b>${r.manual?'Use this name: ':''}${esc(r.name)}</b><span class="glam-result-meta">${sourceTag(r.name)}<small>${r.manual?'Custom entry · no game item ID':r.itemId?'Item #'+r.itemId:'Item'}${r.level?' · Lv '+r.level:''}</small></span></span><i>＋</i></button>`).join('');
+ }
+ function add(entry){
+  const obj=typeof entry==='string'?{name:entry}:entry||{};
+  const name=String(obj.name||'').replace(/\s+/g,' ').trim().slice(0,110);
+  if(!name)return status('Enter an item name first.');
+  const exists=pieces.find(x=>norm(x.name)===norm(name));
+  if(exists){if(itemId(obj.itemId)&&!exists.itemId){exists.itemId=itemId(obj.itemId);save()}render();status(name+' is already in your wardrobe. Your progress was kept.');return}
+  const p=cleanEntry({name,level:obj.level||0,itemId:obj.itemId||null,collected:false,notes:'',steps:[],createdAt:Date.now()});
+  pieces.unshift(p);save();render();status('Added '+name+' to your wardrobe. Use Lodestone or Garland Tools to find its details.');
+ }
+ function card(p){
+  const id=itemId(p.itemId);
+  return `<article class="glam-card ${p.collected?'glam-obtained':''}" data-glam-card="${esc(p.id)}">
+   <div class="glam-card-top"><div class="glam-badges">${p.collected?'<span class="glam-badge green">✓ Collected</span>':'<span class="glam-badge">Wishlist</span>'}${p.level?`<span class="glam-badge">Lv ${p.level}</span>`:''}</div><label class="glam-check"><input data-glam-collected="${esc(p.id)}" type="checkbox" ${p.collected?'checked':''}> Collected</label></div>
+   <div class="glam-item-label">Glamour Item</div><h4>${esc(p.name)}</h4>
+   <div class="glam-card-source">${sourceTag(p.name)}</div>
+   <div class="glam-cardfoot"><a href="${esc(lodestone(p.name))}" target="_blank" rel="noopener noreferrer" title="Search for this item on the official Lodestone database">Lodestone ↗</a><a href="${esc(garland(id))}" target="_blank" rel="noopener noreferrer" title="${id?'Open the item by ID in Garland Tools':'Open Garland Tools to search by item name'}">Garland Tools ↗</a>${id?'':`<button class="btn small ghost" type="button" data-glam-resolve="${esc(p.id)}" title="Look up this item’s game ID for a direct Garland Tools link">Find direct link</button>`}<button type="button" class="btn small" data-glam-edit="${esc(p.id)}">${editingId===p.id?'Close notes':'✎ Notes'}</button><button type="button" class="btn small ghost" data-glam-delete="${esc(p.id)}">Remove</button></div>
+   ${id?'':`<p class="glam-lookup-note">Garland opens its search when an item ID isn't saved yet. Use “Find direct link” to match this item through XIVAPI.</p>`}
+   ${p.notes?`<p class="glam-muted" style="margin-top:12px">My notes: ${esc(p.notes)}</p>`:''}
+   ${deleteId===p.id?`<div class="glam-alert">Remove this piece from your wardrobe? <button type="button" class="btn small" data-glam-confirm="${esc(p.id)}">Yes, remove</button> <button type="button" class="btn small ghost" data-glam-cancel>Cancel</button></div>`:''}
+   ${editingId===p.id?`<div class="glam-editbox"><label>Personal notes<textarea data-glam-notes="${esc(p.id)}" maxlength="500" placeholder="e.g. keep this on my weekly farm list">${esc(p.notes)}</textarea></label><div class="glam-edit-actions"><button type="button" class="btn primary small" data-glam-save="${esc(p.id)}">Save notes</button><button type="button" class="btn small ghost" data-glam-edit="${esc(p.id)}">Cancel</button></div></div>`:''}
+  </article>`;
+ }
+ function render(){
+  const collected=pieces.filter(p=>p.collected).length;
+  $('glamStats').innerHTML=`<article class="glam-stat"><strong>${pieces.length}</strong><span>Pieces in your wardrobe</span></article><article class="glam-stat"><strong>${collected}</strong><span>Owned</span></article><article class="glam-stat"><strong>${pieces.length-collected}</strong><span>Not yet owned</span></article>`;
+  const section=(title,owned,empty)=>{
+   const subset=pieces.filter(p=>p.collected===owned);
+   return `<section class="glam-group" aria-label="${title}"><div class="glam-group-title"><h4>${title}</h4><span class="glam-group-count">${subset.length} ${subset.length===1?'piece':'pieces'}</span></div><div class="glam-group-board">${subset.length?subset.map(card).join(''):`<div class="glam-empty"><strong>${empty}</strong></div>`}</div></section>`;
+  };
+  $('glamBoard').innerHTML=section('Not Yet Owned',false,'Nothing left to farm — add something new above!')+section('Owned',true,'Your collected pieces will appear here.');
+ }
+ // XIVAPI search uses REQUIRED partial-name clauses. Unlike searching the whole
+ // phrase, +Name~"Yuweyawata" +Name~"aiming" asks XIVAPI for candidates.
+ // The final word-start filter removes false positives like "Maiming".
+ function buildQuery(q){return words(q).map(w=>'+Name~"'+w.replace(/["\\]/g,'')+'"').join(' ')}
+ async function exactItemId(name){
+  const query='Name="'+name.replace(/["\\]/g,'')+'"';
+  const url='https://v2.xivapi.com/api/search?'+new URLSearchParams({sheets:'Item',fields:'Name',query,limit:'10',language:'en'});
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
+  try{const resp=await fetch(url,{mode:'cors',signal:controller.signal});if(!resp.ok)throw Error('HTTP '+resp.status);const data=await resp.json();const matched=(data.results||[]).find(r=>norm(r.fields?.Name)===norm(name));return itemId(matched?.row_id)}finally{clearTimeout(timer)}
+ }
+ async function search(){
+  const q=$('glamSearch').value.replace(/\s+/g,' ').trim(),n=++seq;
+  clearTimeout(debounce);
+  drawResults([],q);
+  if(q.length<2){status('Enter at least two characters to search.');return}
+  if(q.length>100){status('Search for fewer than 100 characters, or add your text as a custom item.');return}
+  status('Searching XIVAPI for words starting with: '+words(q).join(' + ')+'…');
+  const unique=new Map();
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),18000);
+  let cursor='',pages=0,foundOnline=0,limited=false;
+  try{
+   do{
+    const url='https://v2.xivapi.com/api/search?'+new URLSearchParams(cursor?
+      {fields:'Name,LevelEquip',cursor,limit:'100'}:
+      {sheets:'Item',fields:'Name,LevelEquip',query:buildQuery(q),limit:'100',language:'en'});
+    const response=await fetch(url,{mode:'cors',signal:controller.signal});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    const data=await response.json();if(n!==seq)return;
+    if(!Array.isArray(data.results))throw Error('Unexpected XIVAPI response');
+    for(const row of data.results){
+     const name=typeof row?.fields?.Name==='string'?row.fields.Name.trim():'';
+     if(!name||!matches(name,q))continue;
+     const key=norm(name),id=itemId(row.row_id);
+     if(!unique.has(key))foundOnline++;
+     const prev=unique.get(key)||{};
+     unique.set(key,{...prev,name,level:Number(row.fields.LevelEquip)||prev.level||0,itemId:id||prev.itemId||null,offline:!!prev.offline});
+    }
+    // Show results as the pages arrive, without losing the user's search context.
+    drawResults([...unique.values()],q);
+    cursor=typeof data.next==='string'?data.next:'';
+    pages++;
+    limited=!!cursor&&pages>=10;
+   }while(cursor&&pages<10);
+   if(n!==seq)return;
+   status(`✓ Live search · ${unique.size} matching item(s). Each keyword must match the start of a word.${limited?' Showing the first 1,000 candidates; narrow your search for more.':''}`);
+  }catch(e){
+   if(n!==seq)return;
+   if(unique.size)drawResults([...unique.values()],q);
+   status(`Live lookup unavailable (${e?.name==='AbortError'?'timed out':String(e?.message||'network error').slice(0,90)}). You can still add a custom name above.`);
+  }finally{clearTimeout(timeout)}
+ }
+ $('glamSearch').addEventListener('input',e=>{
+  ++seq;clearTimeout(debounce);const q=e.target.value.replace(/\s+/g,' ').trim();
+  drawResults([],q);
+  status(q.length<2?'Enter at least two characters to search.':'Searching online in a moment…');
+  if(q.length>=2)debounce=setTimeout(search,450);
+ });
+ $('glamSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();search()}});
+ $('glamSearchBtn').addEventListener('click',search);
+ $('glamAddTyped').addEventListener('click',()=>add($('glamSearch').value));
+ $('glamResults').addEventListener('click',e=>{const el=e.target.closest('[data-glam-result]');if(el&&results[Number(el.dataset.glamResult)])add(results[Number(el.dataset.glamResult)])});
+ $('glamBoard').addEventListener('change',e=>{const el=e.target;const id=el.dataset.glamCollected;if(!id)return;const p=pieces.find(x=>x.id===id);if(p){p.collected=el.checked;save();render()}});
+ $('glamBoard').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(d.glamEdit){editingId=editingId===d.glamEdit?'':d.glamEdit;deleteId='';render();return}
+  if(d.glamDelete){deleteId=d.glamDelete;editingId='';render();return}
+  if('glamCancel' in d){deleteId='';render();return}
+  if(d.glamConfirm){pieces=pieces.filter(p=>p.id!==d.glamConfirm);deleteId='';editingId='';save();render();return}
+  if(d.glamSave){const p=pieces.find(x=>x.id===d.glamSave);const field=p&&$('glamBoard').querySelector(`[data-glam-notes="${CSS.escape(p.id)}"]`);if(!field)return;p.notes=field.value.trim().slice(0,500);editingId='';save();render();status('Saved notes for '+p.name+'.');return}
+  if(d.glamResolve){const p=pieces.find(x=>x.id===d.glamResolve);if(!p)return;b.disabled=true;b.textContent='Searching…';try{const id=await exactItemId(p.name);if(id){p.itemId=id;save();render();status('Direct Garland Tools link ready for '+p.name+'.')}else{b.textContent='Try again';status('No exact item match for '+p.name+'. You can still find it via Lodestone search or Garland Tools search.')}}catch(err){b.textContent='Try again';status('Could not look up an item ID: '+String(err?.message||err).slice(0,100))}finally{b.disabled=false}return}
+ });
+ window.EorzeaGlam={export:()=>JSON.parse(JSON.stringify(pieces)),import:v=>{pieces=sanitize(v);save();render()},add};
+ document.querySelector('[data-main-view="glam"]').addEventListener('click',render);
+ drawResults([], '');render();
+})();
+</script>
+</body>
+</html>
