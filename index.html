@@ -372,6 +372,10 @@ input[type="checkbox"]{accent-color:var(--gold)}
 @media(max-width:420px){.adv-theme-grid{grid-template-columns:1fr 1fr}.adv-theme-option{flex-wrap:wrap}}
 
 
+/* Optional quiet interface click sounds and source editing. */
+.sound-toggle{display:inline-flex;align-items:center;gap:7px;justify-content:center;min-width:104px}
+.sound-toggle[aria-pressed="true"]{border-color:var(--gold2);color:var(--muted)}
+.glam-source-select{display:block;width:100%;margin-top:7px;padding:9px 11px;border:1px solid var(--theme-edge);border-radius:9px;background:var(--theme-field);color:var(--text)}
 /* Glam Hunting: two ownership sections, source hints and precise search results. */
 .glam-board{display:block}
 .glam-group{margin:14px 0 28px}
@@ -402,6 +406,7 @@ try { const saved=JSON.parse(localStorage.getItem('eorzea-adventurer-v3')||'{}')
       <button class="btn" id="exportBtn" type="button" title="Download your tasks as a JSON file">↧ Backup</button>
       <button class="btn" id="importBtn" type="button" title="Restore tasks from a backup">↥ Restore</button>
       <button class="btn primary" id="addBtn" type="button">＋ New task</button>
+      <button class="btn sound-toggle" id="soundToggle" type="button" aria-pressed="false" aria-label="Mute interface sounds" title="Mute interface sounds">🔊 <span>Sound on</span></button>
     </div>
   </div>
   <nav class="app-nav" aria-label="Main navigation">
@@ -447,13 +452,13 @@ try { const saved=JSON.parse(localStorage.getItem('eorzea-adventurer-v3')||'{}')
   <div id="glamView" class="app-view hidden" aria-label="Glamour farming tracker">
     <section class="glam-hero"><div><div class="eyebrow">The glamour atelier</div><h2>Glam <span>Hunting</span></h2><p>Search for pieces, save them to your wardrobe, and mark them collected. Open Lodestone or Garland Tools for the item details.</p></div><div class="glam-sigil" aria-hidden="true">✦</div></section>
     <div id="glamStats" class="glam-stats"></div>
-    <section class="glam-searchbox" aria-label="Find glamour pieces"><h3>Find a glamour piece</h3><p class="glam-muted">Search FFXIV item names using word-start matching in any order. For example, <b>Yuweyawata aiming</b> matches pieces with both words, but <b>aiming</b> will not match <b>maiming</b>. Live results come from XIVAPI.</p>
+    <section class="glam-searchbox" aria-label="Find glamour pieces"><h3>Find a glamour piece</h3><p class="glam-muted">Start typing to search. Live results come from XIVAPI.</p>
       <div class="glam-searchrow"><input id="glamSearch" type="search" maxlength="110" autocomplete="off" placeholder="Try Yuweyawata aiming, Edenmorn, Calfskin..." aria-label="Glamour item name"><button id="glamSearchBtn" class="btn primary" type="button">Search items</button><button id="glamAddTyped" class="btn" type="button" title="Add the exact name typed above, including items not found in the catalogue">＋ Add typed name</button></div>
       <div class="glam-search-status" id="glamSearchStatus" role="status">Search for item names. Keywords must match the beginning of a word, so Aiming will not match Maiming.</div><div id="glamResults" class="glam-results" aria-label="Item results"></div>
     </section>
     <div class="glam-heading"><h3>Your wardrobe ✨</h3></div>
     <section id="glamBoard" class="glam-board" aria-live="polite"></section>
-    <p class="glam-muted" style="margin:17px 0 25px">Quick source labels identify known item sets, not every possible acquisition route. Check Lodestone or Garland Tools for full details. Your collection and personal notes stay saved in this browser.</p>
+    <p id="glamCatalogStatus" class="glam-muted" style="margin:17px 0 8px" role="status">Loading item-source catalogue…</p><p class="glam-muted" style="margin:0 0 25px">Exact item-ID matches appear first. Suggested set labels are shown only where the catalogue has no entry. Unknown sources remain unverified; you can also use ✎ Source to override a label in your personal wardrobe.</p>
   </div><!-- /glamView -->
   <div class="bottom"><span id="resetNote">Resets use FFXIV's global clock, displayed in your local timezone.</span><span>Saved to this browser only · <a href="https://ffxiv.consolegameswiki.com/wiki/Reset" target="_blank" rel="noopener">Reset details</a></span></div>
 </main>
@@ -632,7 +637,7 @@ window.EorzeaClock = (()=>{
     filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});render();
   }));
   el('exportBtn').addEventListener('click',()=>{
-    const payload=JSON.stringify({app:'eorzea-checklist',version:5,exportedAt:new Date().toISOString(),tasks,endgame:window.EorzeaRaid?.export?.(),adventurer:window.EorzeaAdventurer?.export?.(),glamour:window.EorzeaGlam?.export?.()},null,2);
+    const payload=JSON.stringify({app:'eorzea-checklist',version:5,exportedAt:new Date().toISOString(),tasks,endgame:window.EorzeaRaid?.export?.(),adventurer:window.EorzeaAdventurer?.export?.(),glamour:window.EorzeaGlam?.export?.(),sound:window.EorzeaSound?.export?.()},null,2);
     const blob=new Blob([payload],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='eorzea-checklist-backup.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Backup downloaded!');
   });
   el('importBtn').addEventListener('click',()=>el('fileInput').click());
@@ -643,7 +648,7 @@ window.EorzeaClock = (()=>{
       const content=JSON.parse(await file.text()),items=Array.isArray(content)?content:content?.tasks;
       if(!Array.isArray(items)||items.length>3000||!items.every(validTask))throw new Error('Not a valid checklist backup.');
       if(!confirm('Replace all your current tasks with the '+items.length+' tasks in this backup?'))return;
-      const ids=new Set();tasks=items.map(t=>{const x=normalize(t);if(ids.has(x.id))x.id=uuid();ids.add(x.id);return x});if(content?.endgame&&window.EorzeaRaid?.import)window.EorzeaRaid.import(content.endgame);if(content?.adventurer&&window.EorzeaAdventurer?.import)window.EorzeaAdventurer.import(content.adventurer);if(content?.glamour&&window.EorzeaGlam?.import)window.EorzeaGlam.import(content.glamour);persist();render();toast('Backup restored.');
+      const ids=new Set();tasks=items.map(t=>{const x=normalize(t);if(ids.has(x.id))x.id=uuid();ids.add(x.id);return x});if(content?.endgame&&window.EorzeaRaid?.import)window.EorzeaRaid.import(content.endgame);if(content?.adventurer&&window.EorzeaAdventurer?.import)window.EorzeaAdventurer.import(content.adventurer);if(content?.glamour&&window.EorzeaGlam?.import)window.EorzeaGlam.import(content.glamour);if(content?.sound&&window.EorzeaSound?.import)window.EorzeaSound.import(content.sound);persist();render();toast('Backup restored.');
     }catch(err){alert('Could not restore backup: '+err.message)}finally{e.target.value=''}
   });
   persist();render();
@@ -1241,10 +1246,80 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
   {pattern:/^vana.dielian\b/i,label:'Alliance Raid Gear',icon:'🏰',kind:'set'},
   {pattern:/^skyruin\b/i,label:'Extreme Trial Gear / Trade for Totems',icon:'🐉',kind:'set'},
   {pattern:/^(?:archeo[ -]kingdom|rinascita)\b/i,label:'Crafted',icon:'🛠️',kind:'set'},
-  {pattern:/^yuweyawata\b/i,label:'Dungeon Gear',icon:'🗝️',kind:'set'}
+  {pattern:/^(?:dark horse champion.s|babyface champion.s|grand champion.s|cruiser|light-heavyweight|light heavyweight|heavyweight)\b/i,label:'Raid Gear / Trade for Tokens',icon:'⚔️',kind:'set'},
+  {pattern:/^yuweyawata\b/i,label:'Dungeon Gear',icon:'🗝️',kind:'set'},
+  {pattern:/^(?:alexandrian|midan|gordian|dreadwyrm|genji|deltascape|sigmascape|alphascape|edenchoir|edencall|edengate|edengrace|edenmete|edenmorn|pandæmonium|pandemonium)\b/i,label:'Raid Gear / Trade for Tokens',icon:'⚔️',kind:'set'},
+  {pattern:/^(?:panthean|theogonic|obsolete android|hypostatic)\b/i,label:'Alliance Raid Gear',icon:'🏰',kind:'set'},
+  {pattern:/^(?:manalis|ktiseos|paglth.an|vanguard|darbar)\b/i,label:'Dungeon Gear',icon:'🗝️',kind:'set'},
+  {pattern:/^(?:augmented shire|augmented scaevan|augmented cryptlurker|augmented lunar envoy|augmented credendum)\b/i,label:'Trade for Tomestones',icon:'🪙',kind:'set'}
  ];
- function sourceFor(name){const rule=sources.find(x=>x.pattern.test(String(name||'').trim()));return rule||{label:'Source not classified',icon:'🔎',kind:'unknown'}}
- function sourceTag(name){const src=sourceFor(name);return `<span class="glam-source-tag ${src.kind==='unknown'?'unknown':''}" title="${src.kind==='known'?'Known acquisition category':src.kind==='set'?'Suggested from a known equipment set; verify the exact item':'Open Lodestone or Garland Tools for acquisition details'}">${src.icon} ${esc(src.label)}${src.kind==='set'?' <em>· set</em>':''}</span>`}
+ const SOURCE_CHOICES=[
+  ['tomes','🪙','Trade for Tomestones'],
+  ['raid','⚔️','Raid Gear / Trade for Tokens'],
+  ['alliance','🏰','Alliance Raid Gear'],
+  ['extreme','🐉','Extreme Trial Gear / Trade for Totems'],
+  ['dungeon','🗝️','Dungeon Gear'],
+  ['crafted','🛠️','Crafted'],
+  ['vendor','🏪','NPC Vendor'],
+  ['pvp','🏅','PvP Reward'],
+  ['relic','✨','Relic / Questline'],
+  ['quest','📜','Quest Reward'],
+  ['hunt','🎯','Hunt Exchange'],
+  ['fate','💠','FATE / Gemstone Exchange'],
+  ['gold','🎲','Gold Saucer'],
+  ['maps','🗺️','Treasure Maps'],
+  ['retainer','🎒','Retainer Ventures'],
+  ['event','🎉','Event Reward'],
+  ['duty','🗝️','Duty Drop'],
+  ['unavailable','⛔','Currently Unobtainable'],
+  ['other','📦','Other / Multiple Sources']
+ ];
+ // Data-backed classification comes from item-sources.json, keyed by XIVAPI Item row_id.
+ // A user's manually chosen category takes precedence, followed by an exact ID match.
+ // Legacy gear-family suggestions are a last resort and never called "verified".
+ let itemSources=Object.create(null),catalogueState='loading';
+ const classification=(name,chosen='',id=null)=>{
+  const manual=SOURCE_CHOICES.find(x=>x[0]===chosen);
+  if(manual)return [{label:manual[2],icon:manual[1],kind:'manual'}];
+  const match=itemId(id)&&itemSources[String(itemId(id))];
+  if(match&&Array.isArray(match.sources)){
+   const found=[];
+   for(const src of match.sources){
+    const choice=SOURCE_CHOICES.find(x=>x[0]===src.category);
+    if(!choice)continue;
+    if(found.some(x=>x.label===choice[2]))continue;
+    found.push({label:choice[2],icon:choice[1],kind:'catalogue',detail:String(src.detail||'').slice(0,240),origin:match.origin||'supplemental'});
+   }
+   if(found.length)return found.slice(0,4);
+  }
+  const rule=sources.find(x=>x.pattern.test(String(name||'').trim()));
+  return rule?[rule]:[{label:'Source not yet identified',icon:'🔎',kind:'unknown'}];
+ };
+ function sourceTag(name,chosen='',id=null){
+  return classification(name,chosen,id).map(src=>{
+   const hint=src.kind==='manual'?'Category chosen by you':src.kind==='catalogue'?`${src.detail||'Identified from item-source data'} (${src.origin})`:src.kind==='known'?'Curated category; verify the exact item':src.kind==='set'?'Suggested from a gear family, not verified for this item':'Not classified: open Garland Tools or set a personal source';
+   return `<span class="glam-source-tag ${src.kind==='unknown'?'unknown':''}" title="${esc(hint)}">${src.icon} ${esc(src.label)}${src.kind==='set'?' <em>· suggested</em>':''}${src.kind==='catalogue'?' <em>· data</em>':''}${src.kind==='manual'?' <em>· yours</em>':''}</span>`;
+  }).join(' ');
+ }
+ async function loadItemSources(){
+  const info=$('glamCatalogStatus');
+  try{
+   const res=await fetch('./item-sources.json',{cache:'no-store',mode:'same-origin'});
+   if(!res.ok)throw Error('HTTP '+res.status);
+   const data=await res.json();
+   if(data.schema!==1||!data.items||typeof data.items!=='object'||Array.isArray(data.items))throw Error('Unexpected catalogue format');
+   const safe=Object.create(null);let count=0;
+   for(const [id,entry] of Object.entries(data.items)){
+    if(!itemId(id)||!entry||!Array.isArray(entry.sources))continue;
+    const list=entry.sources.filter(x=>x&&SOURCE_CHOICES.some(choice=>choice[0]===x.category)).slice(0,12).map(x=>({category:x.category,detail:String(x.detail||'').slice(0,240)}));
+    if(list.length){safe[id]={sources:list,origin:String(entry.origin||'Community data').slice(0,90)};count++}
+   }
+   itemSources=safe;catalogueState='ready';
+   if(info)info.textContent=`Source catalogue loaded: ${count.toLocaleString()} item IDs. Data matches show item-ID-based categories; unlisted items remain suggestions or unverified.`;
+  }catch(err){catalogueState='unavailable';if(info)info.textContent='Source catalogue unavailable. Your wardrobe still works; suggested source labels and manual edits remain available. Upload item-sources.json alongside index.html.';console.warn('Item-source catalogue:',err)}
+  render();if(results.length)drawResults(results);
+ }
+
  const itemId=n=>Number.isSafeInteger(Number(n))&&Number(n)>0&&Number(n)<10000000?Number(n):null;
  const lodestone=name=>'https://na.finalfantasyxiv.com/lodestone/playguide/db/item/?q='+encodeURIComponent(name);
  const garland=id=>id?'https://garlandtools.org/db/#item/'+id:'https://garlandtools.org/db/';
@@ -1257,6 +1332,7 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
    name:e.name.trim().slice(0,110),level:Math.max(0,Math.min(100,Number(e.level)||0)),
    itemId:itemId(e.itemId),collected:e.collected===true,notes:String(e.notes||'').slice(0,500),
    steps:previousSteps,group:String(e.group||'').slice(0,80),source:String(e.source||'').slice(0,180),
+   sourceCategory:SOURCE_CHOICES.some(x=>x[0]===e.sourceCategory)?e.sourceCategory:'',
    verified:e.verified===true,acquisitionStatus:String(e.acquisitionStatus||'').slice(0,25),
    acquisitionUrl:String(e.acquisitionUrl||'').slice(0,450),acquisitionCheckedAt:Number(e.acquisitionCheckedAt)||0,
    createdAt:Number.isFinite(e.createdAt)?e.createdAt:Date.now()
@@ -1264,12 +1340,12 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
  }
  function sanitize(v){if(!Array.isArray(v)||v.length>500)throw Error('Invalid glamour backup');const ids=new Set();return v.map(cleanEntry).filter(Boolean).map(p=>{if(ids.has(p.id))p.id=uid();ids.add(p.id);return p})}
  function load(){try{const text=localStorage.getItem(KEY);return text?sanitize(JSON.parse(text)):[]}catch(e){console.warn('Could not load wardrobe',e);return []}}
- let pieces=load(),editingId='',deleteId='',results=[],seq=0,debounce=0;
+ let pieces=load(),editingId='',sourceEditId='',deleteId='',results=[],seq=0,debounce=0;
  function status(message){$('glamSearchStatus').textContent=message}
  function save(){try{localStorage.setItem(KEY,JSON.stringify(pieces))}catch(e){status('Could not save your wardrobe locally; export a backup to protect it.')}}
  function drawResults(found,q){
   results=found.slice();
-  $('glamResults').innerHTML=results.map((r,i)=>`<button type="button" class="glam-result ${r.manual?'glam-manual-result':''}" data-glam-result="${i}"><span><b>${r.manual?'Use this name: ':''}${esc(r.name)}</b><span class="glam-result-meta">${sourceTag(r.name)}<small>${r.manual?'Custom entry · no game item ID':r.itemId?'Item #'+r.itemId:'Item'}${r.level?' · Lv '+r.level:''}</small></span></span><i>＋</i></button>`).join('');
+  $('glamResults').innerHTML=results.map((r,i)=>`<button type="button" class="glam-result ${r.manual?'glam-manual-result':''}" data-glam-result="${i}"><span><b>${r.manual?'Use this name: ':''}${esc(r.name)}</b><span class="glam-result-meta">${sourceTag(r.name,"",r.itemId)}<small>${r.level?'Lv '+r.level:'Level unavailable'}</small></span></span><i>＋</i></button>`).join('');
  }
  function add(entry){
   const obj=typeof entry==='string'?{name:entry}:entry||{};
@@ -1283,11 +1359,12 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
  function card(p){
   const id=itemId(p.itemId);
   return `<article class="glam-card ${p.collected?'glam-obtained':''}" data-glam-card="${esc(p.id)}">
-   <div class="glam-card-top"><div class="glam-badges">${p.collected?'<span class="glam-badge green">✓ Collected</span>':'<span class="glam-badge">Wishlist</span>'}${p.level?`<span class="glam-badge">Lv ${p.level}</span>`:''}</div><label class="glam-check"><input data-glam-collected="${esc(p.id)}" type="checkbox" ${p.collected?'checked':''}> Collected</label></div>
+   <div class="glam-card-top"><div class="glam-badges">${p.collected?'<span class="glam-badge green">✓ Collected</span>':''}${p.level?`<span class="glam-badge">Lv ${p.level}</span>`:''}</div><label class="glam-check"><input data-glam-collected="${esc(p.id)}" type="checkbox" ${p.collected?'checked':''}> Collected</label></div>
    <div class="glam-item-label">Glamour Item</div><h4>${esc(p.name)}</h4>
-   <div class="glam-card-source">${sourceTag(p.name)}</div>
-   <div class="glam-cardfoot"><a href="${esc(lodestone(p.name))}" target="_blank" rel="noopener noreferrer" title="Search for this item on the official Lodestone database">Lodestone ↗</a><a href="${esc(garland(id))}" target="_blank" rel="noopener noreferrer" title="${id?'Open the item by ID in Garland Tools':'Open Garland Tools to search by item name'}">Garland Tools ↗</a>${id?'':`<button class="btn small ghost" type="button" data-glam-resolve="${esc(p.id)}" title="Look up this item’s game ID for a direct Garland Tools link">Find direct link</button>`}<button type="button" class="btn small" data-glam-edit="${esc(p.id)}">${editingId===p.id?'Close notes':'✎ Notes'}</button><button type="button" class="btn small ghost" data-glam-delete="${esc(p.id)}">Remove</button></div>
+   <div class="glam-card-source">${sourceTag(p.name,p.sourceCategory,p.itemId)}</div>
+   <div class="glam-cardfoot"><a href="${esc(lodestone(p.name))}" target="_blank" rel="noopener noreferrer" title="Search for this item on the official Lodestone database">Lodestone ↗</a><a href="${esc(garland(id))}" target="_blank" rel="noopener noreferrer" title="${id?'Open the item by ID in Garland Tools':'Open Garland Tools to search by item name'}">Garland Tools ↗</a>${id?'':`<button class="btn small ghost" type="button" data-glam-resolve="${esc(p.id)}" title="Look up this item’s game ID for a direct Garland Tools link">Find direct link</button>`}<button type="button" class="btn small ghost" data-glam-source-edit="${esc(p.id)}">${sourceEditId===p.id?'Close source':'✎ Source'}</button><button type="button" class="btn small" data-glam-edit="${esc(p.id)}">${editingId===p.id?'Close notes':'✎ Notes'}</button><button type="button" class="btn small ghost" data-glam-delete="${esc(p.id)}">Remove</button></div>
    ${id?'':`<p class="glam-lookup-note">Garland opens its search when an item ID isn't saved yet. Use “Find direct link” to match this item through XIVAPI.</p>`}
+   ${sourceEditId===p.id?`<div class="glam-editbox"><label>How do you obtain this item?<select class="glam-source-select" data-glam-source-pick="${esc(p.id)}"><option value="">Auto-detect / unverified</option>${SOURCE_CHOICES.map(x=>`<option value="${x[0]}" ${p.sourceCategory===x[0]?'selected':''}>${x[1]} ${esc(x[2])}</option>`).join('')}</select></label><div class="glam-edit-actions"><button type="button" class="btn primary small" data-glam-source-save="${esc(p.id)}">Save source</button><button type="button" class="btn small ghost" data-glam-source-edit="${esc(p.id)}">Cancel</button></div><p class="glam-muted">Choose a source based on Lodestone or Garland Tools when auto-detection cannot verify it. This only updates your personal wardrobe.</p></div>`:''}
    ${p.notes?`<p class="glam-muted" style="margin-top:12px">My notes: ${esc(p.notes)}</p>`:''}
    ${deleteId===p.id?`<div class="glam-alert">Remove this piece from your wardrobe? <button type="button" class="btn small" data-glam-confirm="${esc(p.id)}">Yes, remove</button> <button type="button" class="btn small ghost" data-glam-cancel>Cancel</button></div>`:''}
    ${editingId===p.id?`<div class="glam-editbox"><label>Personal notes<textarea data-glam-notes="${esc(p.id)}" maxlength="500" placeholder="e.g. keep this on my weekly farm list">${esc(p.notes)}</textarea></label><div class="glam-edit-actions"><button type="button" class="btn primary small" data-glam-save="${esc(p.id)}">Save notes</button><button type="button" class="btn small ghost" data-glam-edit="${esc(p.id)}">Cancel</button></div></div>`:''}
@@ -1366,8 +1443,10 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
  $('glamBoard').addEventListener('change',e=>{const el=e.target;const id=el.dataset.glamCollected;if(!id)return;const p=pieces.find(x=>x.id===id);if(p){p.collected=el.checked;save();render()}});
  $('glamBoard').addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b)return;const d=b.dataset;
-  if(d.glamEdit){editingId=editingId===d.glamEdit?'':d.glamEdit;deleteId='';render();return}
-  if(d.glamDelete){deleteId=d.glamDelete;editingId='';render();return}
+  if(d.glamSourceEdit){sourceEditId=sourceEditId===d.glamSourceEdit?'':d.glamSourceEdit;editingId='';deleteId='';render();return}
+  if(d.glamSourceSave){const p=pieces.find(x=>x.id===d.glamSourceSave);const field=p&&$('glamBoard').querySelector(`[data-glam-source-pick="${CSS.escape(p.id)}"]`);if(!field)return;p.sourceCategory=SOURCE_CHOICES.some(x=>x[0]===field.value)?field.value:'';sourceEditId='';save();render();status('Updated source for '+p.name+'.');return}
+  if(d.glamEdit){editingId=editingId===d.glamEdit?'':d.glamEdit;sourceEditId='';deleteId='';render();return}
+  if(d.glamDelete){deleteId=d.glamDelete;editingId='';sourceEditId='';render();return}
   if('glamCancel' in d){deleteId='';render();return}
   if(d.glamConfirm){pieces=pieces.filter(p=>p.id!==d.glamConfirm);deleteId='';editingId='';save();render();return}
   if(d.glamSave){const p=pieces.find(x=>x.id===d.glamSave);const field=p&&$('glamBoard').querySelector(`[data-glam-notes="${CSS.escape(p.id)}"]`);if(!field)return;p.notes=field.value.trim().slice(0,500);editingId='';save();render();status('Saved notes for '+p.name+'.');return}
@@ -1375,7 +1454,38 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
  });
  window.EorzeaGlam={export:()=>JSON.parse(JSON.stringify(pieces)),import:v=>{pieces=sanitize(v);save();render()},add};
  document.querySelector('[data-main-view="glam"]').addEventListener('click',render);
- drawResults([], '');render();
+ drawResults([], '');render();loadItemSources();
+})();
+</script>
+<script>
+/* Quiet, interaction-only synthesized UI sound; no downloaded audio or autoplay. */
+(function(){'use strict';
+ const KEY='eorzea-sound-v1',toggle=document.getElementById('soundToggle');
+ let muted=false,ctx=null;
+ try{muted=JSON.parse(localStorage.getItem(KEY)||'{}').muted===true}catch(_){muted=false}
+ function paint(){toggle.setAttribute('aria-pressed',String(muted));toggle.setAttribute('aria-label',muted?'Unmute interface sounds':'Mute interface sounds');toggle.title=toggle.getAttribute('aria-label');toggle.innerHTML=muted?'🔇 <span>Muted</span>':'🔊 <span>Sound on</span>'}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify({muted}))}catch(_){}}
+ function play(){
+  if(muted)return;
+  try{
+   const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+   if(!ctx)ctx=new AC();
+   if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+   const t=ctx.currentTime,gain=ctx.createGain(),osc=ctx.createOscillator();
+   osc.type='sine';osc.frequency.setValueAtTime(650,t);osc.frequency.exponentialRampToValueAtTime(480,t+.043);
+   gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.013,t+.006);gain.gain.exponentialRampToValueAtTime(.0001,t+.052);
+   osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+.06);
+  }catch(_){/* Sound is optional and should never interrupt the app. */}
+ }
+ toggle.addEventListener('click',()=>{muted=!muted;save();paint();if(!muted)play()});
+ document.addEventListener('click',event=>{
+  const el=event.target instanceof Element?event.target:null;
+  if(!el||el.closest('#soundToggle'))return;
+  if(el.closest('button,input[type="checkbox"],input[type="radio"],summary,[role="button"]'))play();
+ },true);
+ document.addEventListener('change',event=>{if(event.target?.matches?.('select'))play()},true);
+ window.EorzeaSound={export:()=>({muted}),import:value=>{if(value&&typeof value.muted==='boolean'){muted=value.muted;save();paint()}}};
+ paint();
 })();
 </script>
 </body>

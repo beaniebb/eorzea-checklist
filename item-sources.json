@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-10-19",
+  "description": "A starter item-ID catalogue. The optional updater can expand it using community supplemental data. These entries are manually checked; coverage is not comprehensive.",
+  "items": {
+    "44909": {
+      "name": "Skyruin Bardiche",
+      "origin": "Curated: FFXIV Community Wiki / ERIONES",
+      "sources": [
+        {"category": "extreme", "detail": "Worqor Lar Dor (Extreme)"},
+        {"category": "vendor", "detail": "Uah'shepya, Solution Nine (X:8.7 Y:13.5), 10 Skyruin Totems"}
+      ]
+    },
+    "49995": {
+      "name": "Vana'dielian Surcoat of Maiming",
+      "origin": "Curated: FFXIV Lodestone / item database",
+      "sources": [
+        {"category": "alliance", "detail": "Windurst: The Third Walk"}
+      ]
+    },
+    "47038": {
+      "name": "Archeo Kingdom Cuirass of Fending",
+      "origin": "Curated: ERIONES recipe",
+      "sources": [
+        {"category": "crafted", "detail": "Armorer level 100 master recipe"}
+      ]
+    }
+  }
+}
