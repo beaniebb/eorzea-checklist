@@ -256,7 +256,7 @@ h1 span{color:var(--gold)}
 .glam-searchrow input{background:#0b192a;border:1px solid #576780;border-radius:9px;color:#f8f1f0;flex:1;min-width:220px;padding:12px 13px;font:inherit;font-size:14px}
 .glam-searchrow input:focus-visible{outline:2px solid #d6b6db;outline-offset:1px}
 .glam-search-status{font-size:11px;color:#b6becd;margin:10px 0 0}
-.glam-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:13px 0 3px;max-height:260px;overflow:auto}
+.glam-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:13px 0 3px;max-height:430px;overflow:auto}
 .glam-result{cursor:pointer;min-width:0;text-align:left;border:1px solid #3b4e68;background:#20314a;border-radius:9px;color:#edf1f5;padding:10px 11px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .glam-result:hover,.glam-result:focus-visible{background:#334760;border-color:#a78dba;outline:none}
 .glam-manual-result{border-style:dashed;border-color:#a99ab9;background:#2a2946}.glam-manual-result:hover{background:#3a375a}
@@ -289,6 +289,10 @@ h1 span{color:var(--gold)}
 .glam-editbox label{font-size:11px;color:#d3c0d6;font-weight:750}.glam-editbox input,.glam-editbox textarea,.glam-editbox select{width:100%;background:#0e1b2b;border:1px solid #627087;border-radius:8px;padding:9px;color:#f1f3f5;font:inherit;font-size:12px}.glam-editbox textarea{min-height:85px;resize:vertical}
 .glam-edit-actions{display:flex;gap:8px;flex-wrap:wrap}
 .glam-alert{color:#e7c19c;font-size:11px;margin-top:10px;line-height:1.55}
+.glam-source-preview{border:1px solid #91754b;background:#273246;border-radius:10px;padding:13px;margin:12px 0;color:#f1e3cd}
+.glam-source-preview strong{color:#f6d3a0}.glam-source-preview ol{margin:9px 0 12px;padding-left:19px;font-size:12px;line-height:1.6}.glam-source-preview li{margin:4px 0}.glam-source-preview .glam-edit-actions{margin-top:10px}
+.glam-cardfoot button:disabled{opacity:.65;cursor:wait}
+.glam-lookup-note{font-size:11px;color:#a8b6c6;margin:10px 0 0;line-height:1.55}.glam-cardfoot a{display:inline-flex;align-items:center;gap:4px}.glam-cardfoot a:focus-visible{outline:2px solid #eed6a8;outline-offset:2px}
 .glam-empty{padding:33px 25px;text-align:center;border:1px dashed #66758d;border-radius:13px;color:#afc0d0;background:#17263a}.glam-empty strong{display:block;font:normal 22px Georgia,serif;margin-bottom:8px;color:#f0d4bc}
 @media(max-width:840px){.glam-board{grid-template-columns:1fr}.glam-results{grid-template-columns:1fr}}
 @media(max-width:530px){.glam-hero{padding:18px}.glam-sigil{display:none}.glam-stats{gap:7px}.glam-stat{padding:11px}.glam-stat strong{font-size:22px}.glam-searchbox{padding:14px}}
@@ -350,16 +354,16 @@ h1 span{color:var(--gold)}
     <div class="inline-note">⚙ This is a manual, offline tracker. Its weekly Savage checkboxes are personal farming goals — <b>not</b> loot-lockout indicators. Current Heavyweight Savage loot restrictions were lifted in patch 7.56. Ultimate reward eligibility may still be weekly. <a style="color:#f0ce8e" href="https://na.finalfantasyxiv.com/lodestone/topics/detail/c46881a31a2c90d0965493c921b434eca09113f8" target="_blank" rel="noopener">Ultimate patch notes ↗</a></div>
   </div><!-- /endgameView -->
   <div id="glamView" class="app-view hidden" aria-label="Glamour farming tracker">
-    <section class="glam-hero"><div><div class="eyebrow">The glamour atelier</div><h2>Your <span>Farming Wardrobe</span></h2><p>Choose a piece, get its acquisition route, and keep a permanent collection checklist. Verified guides work offline; live item search needs an internet connection.</p></div><div class="glam-sigil" aria-hidden="true">✦</div></section>
+    <section class="glam-hero"><div><div class="eyebrow">The glamour atelier</div><h2>Your <span>Farming Wardrobe</span></h2><p>Search for pieces, save them to your wardrobe, and mark them collected. Open Lodestone or Garland Tools for the item details.</p></div><div class="glam-sigil" aria-hidden="true">✦</div></section>
     <div id="glamStats" class="glam-stats"></div>
-    <section class="glam-searchbox" aria-label="Find glamour pieces"><h3>Find a glamour piece</h3><p class="glam-muted">Search the current XIVAPI item database for glamour names, or choose an offline ready-made guide. Live names are not the same as verified drop instructions; add or edit the exact route below.</p>
-      <div class="glam-searchrow"><input id="glamSearch" type="search" maxlength="110" autocomplete="off" placeholder="Try Calfskin Rider's Jacket, Edenmorn..." aria-label="Glamour item name"><button id="glamSearchBtn" class="btn primary" type="button">Search items</button><button id="glamAddTyped" class="btn" type="button" title="Add the exact name typed above, including items not found in the catalogue">＋ Add typed name</button></div>
-      <div class="glam-search-status" id="glamSearchStatus" role="status">Search ready-made guides offline or look up more items online. You can add any name even without internet.</div><p class="glam-live-hint">For the best chance of live search, publish this page over HTTPS (e.g. GitHub Pages). <button id="glamTestLive" type="button">Test live search here</button> · <a href="https://v2.xivapi.com/api/search?sheets=Item&amp;fields=Name&amp;query=Name%7E%22Edenmorn%22&amp;limit=3" target="_blank" rel="noopener noreferrer">Open API JSON ↗</a> · Opening JSON in a separate tab does not test whether this website can read API results.</p><div id="glamResults" class="glam-results" aria-label="Item results"></div>
-      <div class="glam-preset-label">Try a verified route</div><div class="glam-quick" id="glamQuickPicks"></div>
+    <section class="glam-searchbox" aria-label="Find glamour pieces"><h3>Find a glamour piece</h3><p class="glam-muted">Find all matching items using partial keywords in any order. For example, <b>Yuweyawata aiming</b> finds items containing both words. Search works online with XIVAPI; starter suggestions remain available offline.</p>
+      <div class="glam-searchrow"><input id="glamSearch" type="search" maxlength="110" autocomplete="off" placeholder="Try Yuweyawata aiming, Edenmorn, Calfskin..." aria-label="Glamour item name"><button id="glamSearchBtn" class="btn primary" type="button">Search items</button><button id="glamAddTyped" class="btn" type="button" title="Add the exact name typed above, including items not found in the catalogue">＋ Add typed name</button></div>
+      <div class="glam-search-status" id="glamSearchStatus" role="status">Try one or more keywords. Every word must appear in the item name.</div><p class="glam-live-hint">For the best chance of live search, publish this page over HTTPS (e.g. GitHub Pages). <button id="glamTestLive" type="button">Test live search here</button> · <a href="https://v2.xivapi.com/api/search?sheets=Item&amp;fields=Name&amp;query=Name%7E%22Edenmorn%22&amp;limit=3" target="_blank" rel="noopener noreferrer">Open API JSON ↗</a> · Opening JSON in a separate tab does not test whether this website can read API results.</p><div id="glamResults" class="glam-results" aria-label="Item results"></div>
+      <div class="glam-preset-label">Browse starter suggestions</div><div class="glam-quick" id="glamQuickPicks"></div>
     </section>
     <div class="glam-heading"><h3>Your wardrobe ✨</h3><select class="glam-select" id="glamFilter" aria-label="Filter glamour farming tiles"><option value="all">All pieces</option><option value="todo">Still farming</option><option value="collected">Collected</option></select></div>
     <section id="glamBoard" class="glam-board" aria-live="polite"></section>
-    <p class="glam-muted" style="margin:17px 0 25px">Format: Glamour Item → Source → How to obtain. List each verified duty drop or vendor exchange separately, including currency name, quantity, NPC, zone and coordinates when available. XIVAPI searches item names, not acquisition routes. Unverified items remain editable. Automatic wiki lookups may fail if the wiki blocks requests; use the item's linked page to verify details.</p>
+    <p class="glam-muted" style="margin:17px 0 25px">Each tile links to the official Lodestone item search and Garland Tools. Garland opens the exact item when its game ID is available. No acquisition steps are shown. Your collected status and notes are saved in this browser.</p>
   </div><!-- /glamView -->
   <div class="bottom"><span id="resetNote">Resets use FFXIV's global clock, displayed in your local timezone.</span><span>Saved to this browser only · <a href="https://ffxiv.consolegameswiki.com/wiki/Reset" target="_blank" rel="noopener">Reset details</a></span></div>
 </main>
@@ -1075,211 +1079,210 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
 </script>
 
 <script>
-/* ── Glamour Farming Wardrobe: isolated v5 state ──────────────────── */
+/* ── Glamour Wardrobe: keyword search and external item references ─────────
+   Keeps the v5 localStorage/backup schema; old farming steps are preserved in
+   backups for compatibility but intentionally not displayed or modified. */
 (function(){'use strict';
  const KEY='eorzea-glam-v1';
  const $=id=>document.getElementById(id);
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const uid=()=>crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);
- const wiki=name=>'https://ffxiv.consolegameswiki.com/wiki/'+encodeURIComponent(name.trim().replace(/\s+/g,'_'));
- // Each curated acquisition route is linked to its original item page and written as player-actionable steps.
+ const uid=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);
  const CATALOG=[
- {name:'No.2 Type B Dress',group:'Alliance raid',level:1,source:'The Copied Factory · Shadowbringers',steps:['Unlock and queue for The Copied Factory (YoRHa: Dark Apocalypse alliance raid).','Clear the duty and obtain the No.2 Type B Materiel Storage Crate from its reward coffers.','Open the crate to receive the full No.2 Type B attire, including the dress.']},
- {name:'No.2 Type B Boots',group:'Alliance raid',level:1,source:'The Copied Factory · Shadowbringers',steps:['Queue for The Copied Factory alliance raid.','Obtain the No.2 Type B Materiel Storage Crate from the duty.','Open the crate: the boots are one of the five included glamour pieces.']},
- {name:'No.2 Type B Gloves',group:'Alliance raid',level:1,source:'The Copied Factory · Shadowbringers',steps:['Complete The Copied Factory alliance raid.','Obtain the No.2 Type B Materiel Storage Crate from the duty.','Open the crate to claim the gloves and the rest of the attire.']},
- {name:"Paglth'an Jacket of Fending",group:'Dungeon drop',level:80,source:"Paglth'an · Shadowbringers",steps:["Unlock the level 80 dungeon Paglth'an.","Run Paglth'an; open its treasure coffers for the Jacket of Fending.","Repeat the duty as needed until you obtain the jacket (not a guaranteed individual drop)."]},
- {name:'Edenmorn Coat of Fending',group:'Savage / tokens',level:80,source:"Eden's Promise (Savage) · Shadowbringers",steps:["Obtained from Eden's Promise: Eternity (Savage) through the Edenmorn Chest Gear Coffer (IL 530).","Trade 8 Books of Eternity to Yhal Yal in Eulmore (X:10.1, Y:11.5).","Alternatively trade 8 Books of Eternity to Ghul Gul in Amh Araeng (X:26.6, Y:16.4) or Mowen's Merchant in the Crystarium (X:10.1, Y:11.8)."]},
- {name:"Calfskin Rider's Jacket",group:'Crafting / market',level:1,source:'Master Leatherworker VIII · Shadowbringers',steps:['Unlock the level 80 ★★★★ Master Leatherworker VIII recipe, or look for a tradable jacket on the Market Board.','Gather/buy 2 Calf Leather, 3 Megalania Leather, 1 Dwarven Mythril Ingot, 7 Earth Crystals and 7 Wind Crystals.','Craft the Calfskin Rider\'s Jacket on Leatherworker. Alternative: rare Occult Crescent North Horn chest or Sack of Silvered Light.']},
- {name:'Dalmascan Draped Top',group:'Crafting / market',level:1,source:'Master Weaver VII · Shadowbringers',steps:['Unlock the level 80 ★★ Master Weaver VII recipe or purchase the tradable top on the Market Board.','Gather 3 Cloth-softening Powder, 2 Ethereal Silk, 2 Sea Swallow Leather, 7 Lightning Crystals and 7 Wind Crystals.','Craft the top as Weaver, or find it from Occult Crescent South Horn coffers / Silver-tinged Sacks.']},
- {name:"Skyworker's Singlet",group:'Scrip exchange',level:1,source:'The Firmament · Ishgard',steps:["Enter the Firmament in Ishgard (Ishgardian Restoration area).","Earn 2,200 Skybuilders' Scrips through Ishgardian Restoration activities.","Purchase Skyworker's Singlet from Enie in The Firmament (X:12, Y:14)."]},
- {name:'False Monarchy Armor',group:'PvP currency',level:1,source:"Wolves' Den Pier · Trophy Crystals",steps:["Travel to the Wolves' Den Pier (PvP hub).","Obtain 1,500 Trophy Crystals through PvP activities.","Buy False Monarchy Armor from Crystal Quartermaster (X:4.4, Y:6.1), Trophy Crystal Exchange (Universal Gear) II. The original Series 3 coffer was a previous reward."]},
- {name:'Frontier Jacket',group:'Crafting / market',level:1,source:'Master Leatherworker VIII · Shadowbringers',steps:['Learn the Master Leatherworker VIII level 80 ★★★★ recipe or buy the tradable jacket on the Market Board.','Gather 2 Frontier Cloth, 3 Thylacoleo Leather, 1 Saffron Cloth, 7 Earth Crystals and 7 Wind Crystals.','Craft on Leatherworker. Alternative: Sack of Silvered Light or Occult Crescent North Horn random coffers.']},
- {name:"Replica Sky Pirate's Coat of Fending",group:'Crafting / market',level:1,source:'Armorer level 61',steps:['Level Armorer to 61 or buy a tradable replica on the Market Board.','Gather 2 Skysteel Ingot, 1 Skysteel Cloth, 1 Gagana Leather, 1 High Steel Nugget, 3 Ice Crystals and 2 Earth Crystals.','Craft the replica coat as Armorer; replicas are wearable by any class.']},
- {name:'No.2 Type B Leggings',group:'Alliance raid',level:1,source:'The Copied Factory · Shadowbringers',steps:['Unlock and complete The Copied Factory alliance raid.','Obtain the No.2 Type B Materiel Storage Crate.','Open it to receive the leggings and other attire pieces.']},
- {name:'No.2 Type B Goggles',group:'Alliance raid',level:1,source:'The Copied Factory · Shadowbringers',steps:['Run The Copied Factory alliance raid.','Obtain a No.2 Type B Materiel Storage Crate.','Open it to receive the goggles and other attire pieces.']}
- ];
- const pickMap=new Map(CATALOG.map(x=>[x.name.toLowerCase(),x]));
- const sourceType=group=>({
-  'Alliance raid':'Duty · Alliance raid','Dungeon drop':'Duty · Dungeon','Savage / tokens':'Duty / NPC Vendor',
-  'Extreme / trials':'Duty · Trial','Crafting / market':'Crafting / Market Board','Vendor / currency':'NPC Vendor',
-  'Scrip exchange':'NPC Vendor','PvP currency':'NPC Vendor · PvP','Quest / achievement':'Quest / Achievement',
-  'Source to verify':'To verify'
- })[group]||group||'To verify';
- const cleanEntry=e=>{
-  if(!e||typeof e.name!=='string'||!e.name.trim())return null;
-  const steps=Array.isArray(e.steps)?e.steps.slice(0,18).map(x=>typeof x==='string'?{text:x,done:false}:{text:String(x?.text||'').slice(0,350),done:x?.done===true}).filter(x=>x.text.trim()):[];
-  return {id:typeof e.id==='string'?e.id.slice(0,130):uid(),name:e.name.trim().slice(0,110),group:String(e.group||'Source to verify').slice(0,80),source:String(e.source||'Acquisition not yet verified').slice(0,180),level:Math.max(0,Math.min(100,Number(e.level)||0)),verified:e.verified===true&&!!pickMap.get(e.name.toLowerCase())&&String(e.source||'')===pickMap.get(e.name.toLowerCase()).source&&steps.map(x=>x.text).join('|')===pickMap.get(e.name.toLowerCase()).steps.join('|'),steps:steps.length?steps:[{text:'Open the item page linked below and find its Acquisition section.',done:false},{text:'Add the exact duty, vendor, craft or exchange route using Edit steps.',done:false}],collected:e.collected===true,notes:String(e.notes||'').slice(0,500),createdAt:Number.isFinite(e.createdAt)?e.createdAt:Date.now()};
- };
- function load(){try{const raw=localStorage.getItem(KEY);return raw?sanitize(JSON.parse(raw)):[]}catch(e){console.warn('Glam collection not loaded',e);return []}}
- function sanitize(value){if(!Array.isArray(value)||value.length>500)throw Error('Invalid glamour backup');const ids=new Set();return value.map(cleanEntry).filter(Boolean).map(x=>{if(ids.has(x.id))x.id=uid();ids.add(x.id);return x})}
- let pieces=load(), filter='all', editingId='', deleteId='', searchSeq=0, searchTimer=0, results=[], wikiStatus={};
- function save(){try{localStorage.setItem(KEY,JSON.stringify(pieces))}catch(e){status('Could not save glamour progress locally; use Backup to protect it.')}}
- const localResults=(q)=>CATALOG.filter(x=>x.name.toLowerCase().includes(q.toLowerCase())).slice(0,12);
- function status(s){$('glamSearchStatus').textContent=s}
- function getResult(name){return pickMap.get(String(name).trim().toLowerCase())}
- function add(name){name=String(name||'').trim().slice(0,110);if(!name)return status('Enter an item name first.');
-  const duplicate=pieces.find(x=>x.name.toLowerCase()===name.toLowerCase());if(duplicate){filter='all';$('glamFilter').value='all';render();status('Already in your wardrobe: '+name+'. Your progress was kept.');return}
-  const preset=getResult(name);const piece=cleanEntry(preset?{name:preset.name,group:preset.group,source:preset.source,level:preset.level,steps:preset.steps,verified:true}:{name,group:'Source to verify',source:'Not yet verified — check the acquisition page',steps:[],verified:false});
-  pieces.unshift(piece);save();render();status(preset?'Added verified farming steps for '+name+'.':'Added '+name+'. Check its wiki source and edit the acquisition steps before farming.');
+ {
+  "name": "No.2 Type B Dress",
+  "level": 1
+ },
+ {
+  "name": "No.2 Type B Boots",
+  "level": 1
+ },
+ {
+  "name": "No.2 Type B Gloves",
+  "level": 1
+ },
+ {
+  "name": "Paglth'an Jacket of Fending",
+  "level": 80
+ },
+ {
+  "name": "Edenmorn Coat of Fending",
+  "level": 80
+ },
+ {
+  "name": "Calfskin Rider's Jacket",
+  "level": 1
+ },
+ {
+  "name": "Dalmascan Draped Top",
+  "level": 1
+ },
+ {
+  "name": "Skyworker's Singlet",
+  "level": 1
+ },
+ {
+  "name": "False Monarchy Armor",
+  "level": 1
+ },
+ {
+  "name": "Frontier Jacket",
+  "level": 1
+ },
+ {
+  "name": "Replica Sky Pirate's Coat of Fending",
+  "level": 1
+ },
+ {
+  "name": "No.2 Type B Leggings",
+  "level": 1
+ },
+ {
+  "name": "No.2 Type B Goggles",
+  "level": 1
  }
- function card(p){const steps=p.steps.filter(s=>s.text);const finished=steps.filter(s=>s.done).length;
-  const link=wiki(p.name);
-  return `<article class="glam-card ${p.collected?'glam-obtained':''}" data-glam-card="${esc(p.id)}"><div class="glam-card-top"><div class="glam-badges"><span class="glam-badge ${p.verified?'gold':''}">${p.verified?'✓ Verified route':'? Needs source check'}</span><span class="glam-badge">${esc(p.group)}</span>${p.collected?'<span class="glam-badge green">Collected</span>':''}</div><label class="glam-check"><input data-glam-collected="${esc(p.id)}" type="checkbox" ${p.collected?'checked':''}> Collected</label></div>
-    <div class="glam-item-label">Glamour Item</div><h4>${esc(p.name)}</h4><div class="glam-source"><strong>Source:</strong> ${esc(sourceType(p.group))}${p.source&&p.source!=='Acquisition not yet verified'?' · '+esc(p.source):''}${p.level?' · Lv '+p.level:''}</div>
-    <div class="glam-instructions"><div class="glam-instructions-title">How to obtain: <span style="font-weight:500;letter-spacing:0;text-transform:none;color:#bbccd4">${finished}/${steps.length} completed</span></div>${steps.length?`<ul class="glam-steps-list">${steps.map((s,i)=>`<li><label class="glam-step ${s.done?'is-done':''}"><input type="checkbox" data-glam-step="${esc(p.id)}" data-index="${i}" ${s.done?'checked':''}><span>${esc(s.text)}</span></label></li>`).join('')}</ul>`:'<p class="glam-muted">No acquisition route recorded yet.</p>'}</div>
-    ${!p.verified?'<p class="glam-alert">This item needs a source check. Use Find steps to attempt a community wiki lookup, or edit the farming route manually.</p>':''}${wikiStatus[p.id]?`<p class="glam-alert" role="status">${esc(wikiStatus[p.id])}</p>`:''}
-    ${p.notes?`<p class="glam-muted">Personal notes: ${esc(p.notes)}</p>`:''}
-    <div class="glam-cardfoot"><a href="${link}" target="_blank" rel="noopener noreferrer">Item acquisition ↗</a><a href="https://garlandtools.org/db/#" target="_blank" rel="noopener noreferrer" title="Search for this item in Garland Tools">Garland Tools ↗</a>${!p.verified?`<button type="button" class="btn small" data-glam-autofill="${esc(p.id)}" title="Try retrieving the acquisition section from FFXIV Wiki">↻ Find steps</button>`:''}<button type="button" class="btn small" data-glam-edit="${esc(p.id)}">${editingId===p.id?'Close editor':'✎ Edit steps'}</button><button type="button" class="btn small ghost" data-glam-delete="${esc(p.id)}">Remove</button></div>
-    ${deleteId===p.id?`<div class="glam-alert">Remove this farming tile? <button class="btn small" type="button" data-glam-delete-confirm="${esc(p.id)}">Yes, remove</button> <button class="btn small ghost" type="button" data-glam-delete-cancel>Cancel</button></div>`:''}
-    ${editingId===p.id?`<div class="glam-editbox"><label>Source details · duty, vendor, zone, or crafting recipe<input data-glam-field-source="${esc(p.id)}" maxlength="180" value="${esc(p.source)}" placeholder="e.g. AAC Heavyweight M1 (Savage), or Yhal Yal · Eulmore"></label><label>Source type<select data-glam-field-group="${esc(p.id)}">${['Source to verify','Duty','NPC Vendor','Dungeon drop','Alliance raid','Savage / tokens','Extreme / trials','Crafting / market','Vendor / currency','PvP currency','Quest / achievement','Market Board','Other'].map(g=>`<option ${p.group===g?'selected':''}>${esc(g)}</option>`).join('')}</select></label><label>How to obtain · one bullet / route per line<textarea data-glam-field-steps="${esc(p.id)}" maxlength="4500" placeholder="Trade 8 Books of Eternity to Yhal Yal in Eulmore (X:10.1, Y:11.5).&#10;Obtained from Eden's Promise: Eternity (Savage).">${esc(p.steps.map(x=>x.text).join('\n'))}</textarea></label><label>My notes<input data-glam-field-notes="${esc(p.id)}" maxlength="500" value="${esc(p.notes)}" placeholder="e.g. queue unsynced with friends"></label><div class="glam-edit-actions"><button class="btn primary small" type="button" data-glam-save="${esc(p.id)}">Save instructions</button><button class="btn small ghost" type="button" data-glam-edit="${esc(p.id)}">Cancel</button></div><p class="glam-muted">Write an exact instruction on each line, including token quantity, NPC and coordinates where known. Each line will display as its own checklist bullet. Existing completion remains when text is unchanged.</p></div>`:''}
+];
+ const pickMap=new Map(CATALOG.map(x=>[x.name.toLowerCase(),x]));
+ const norm=s=>String(s||'').toLocaleLowerCase('en').replace(/\s+/g,' ').trim();
+ const words=s=>[...new Set(norm(s).split(' ').filter(Boolean))];
+ const matches=(name,query)=>words(query).every(w=>norm(name).includes(w));
+ const itemId=n=>Number.isSafeInteger(Number(n))&&Number(n)>0&&Number(n)<10000000?Number(n):null;
+ const lodestone=name=>'https://na.finalfantasyxiv.com/lodestone/playguide/db/item/?q='+encodeURIComponent(name);
+ const garland=id=>id?'https://garlandtools.org/db/#item/'+id:'https://garlandtools.org/db/';
+ // Sanitize prior app data without deleting recorded checkmarks, notes, or old routes.
+ function cleanEntry(e){
+  if(!e||typeof e.name!=='string'||!e.name.trim())return null;
+  const previousSteps=Array.isArray(e.steps)?e.steps.slice(0,18).map(x=>typeof x==='string'?{text:x.slice(0,350),done:false}:{text:String(x?.text||'').slice(0,350),done:x?.done===true}).filter(x=>x.text.trim()):[];
+  return {
+   id:typeof e.id==='string'&&e.id?e.id.slice(0,130):uid(),
+   name:e.name.trim().slice(0,110),level:Math.max(0,Math.min(100,Number(e.level)||0)),
+   itemId:itemId(e.itemId),collected:e.collected===true,notes:String(e.notes||'').slice(0,500),
+   steps:previousSteps,group:String(e.group||'').slice(0,80),source:String(e.source||'').slice(0,180),
+   verified:e.verified===true,acquisitionStatus:String(e.acquisitionStatus||'').slice(0,25),
+   acquisitionUrl:String(e.acquisitionUrl||'').slice(0,450),acquisitionCheckedAt:Number(e.acquisitionCheckedAt)||0,
+   createdAt:Number.isFinite(e.createdAt)?e.createdAt:Date.now()
+  };
+ }
+ function sanitize(v){if(!Array.isArray(v)||v.length>500)throw Error('Invalid glamour backup');const ids=new Set();return v.map(cleanEntry).filter(Boolean).map(p=>{if(ids.has(p.id))p.id=uid();ids.add(p.id);return p})}
+ function load(){try{const text=localStorage.getItem(KEY);return text?sanitize(JSON.parse(text)):[]}catch(e){console.warn('Could not load wardrobe',e);return []}}
+ let pieces=load(),filter='all',editingId='',deleteId='',results=[],seq=0,debounce=0;
+ function status(message){$('glamSearchStatus').textContent=message}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify(pieces))}catch(e){status('Could not save your wardrobe locally; export a backup to protect it.')}}
+ function localResults(q){return CATALOG.filter(x=>matches(x.name,q)).slice(0,35).map(x=>({...x,offline:true}))}
+ function drawResults(found,q){
+  results=found.slice();
+  $('glamResults').innerHTML=results.map((r,i)=>`<button type="button" class="glam-result ${r.manual?'glam-manual-result':''}" data-glam-result="${i}"><span><b>${r.manual?'Use this name: ':''}${esc(r.name)}</b><small>${r.manual?'Custom entry · no game item ID':r.offline&&!r.itemId?'Starter suggestion':r.itemId?'FFXIV item #'+r.itemId:'Item suggestion'}${r.level?' · Lv '+r.level:''}</small></span><i>＋</i></button>`).join('');
+ }
+ function add(entry){
+  const obj=typeof entry==='string'?{name:entry}:entry||{};
+  const name=String(obj.name||'').replace(/\s+/g,' ').trim().slice(0,110);
+  if(!name)return status('Enter an item name first.');
+  const exists=pieces.find(x=>norm(x.name)===norm(name));
+  if(exists){if(itemId(obj.itemId)&&!exists.itemId){exists.itemId=itemId(obj.itemId);save()}filter='all';$('glamFilter').value='all';render();status(name+' is already in your wardrobe. Your progress was kept.');return}
+  const p=cleanEntry({name,level:obj.level||pickMap.get(norm(name))?.level||0,itemId:obj.itemId||null,collected:false,notes:'',steps:[],createdAt:Date.now()});
+  pieces.unshift(p);save();render();status('Added '+name+' to your wardrobe. Use Lodestone or Garland Tools to find its details.');
+ }
+ function card(p){
+  const id=itemId(p.itemId);
+  return `<article class="glam-card ${p.collected?'glam-obtained':''}" data-glam-card="${esc(p.id)}">
+   <div class="glam-card-top"><div class="glam-badges">${p.collected?'<span class="glam-badge green">✓ Collected</span>':'<span class="glam-badge">Wishlist</span>'}${p.level?`<span class="glam-badge">Lv ${p.level}</span>`:''}</div><label class="glam-check"><input data-glam-collected="${esc(p.id)}" type="checkbox" ${p.collected?'checked':''}> Collected</label></div>
+   <div class="glam-item-label">Glamour Item</div><h4>${esc(p.name)}</h4>
+   <div class="glam-cardfoot"><a href="${esc(lodestone(p.name))}" target="_blank" rel="noopener noreferrer" title="Search for this item on the official Lodestone database">Lodestone ↗</a><a href="${esc(garland(id))}" target="_blank" rel="noopener noreferrer" title="${id?'Open the item by ID in Garland Tools':'Open Garland Tools to search by item name'}">Garland Tools ↗</a>${id?'':`<button class="btn small ghost" type="button" data-glam-resolve="${esc(p.id)}" title="Look up this item’s game ID for a direct Garland Tools link">Find direct link</button>`}<button type="button" class="btn small" data-glam-edit="${esc(p.id)}">${editingId===p.id?'Close notes':'✎ Notes'}</button><button type="button" class="btn small ghost" data-glam-delete="${esc(p.id)}">Remove</button></div>
+   ${id?'':`<p class="glam-lookup-note">Garland opens its search when an item ID isn't saved yet. Use “Find direct link” to match this item through XIVAPI.</p>`}
+   ${p.notes?`<p class="glam-muted" style="margin-top:12px">My notes: ${esc(p.notes)}</p>`:''}
+   ${deleteId===p.id?`<div class="glam-alert">Remove this piece from your wardrobe? <button type="button" class="btn small" data-glam-confirm="${esc(p.id)}">Yes, remove</button> <button type="button" class="btn small ghost" data-glam-cancel>Cancel</button></div>`:''}
+   ${editingId===p.id?`<div class="glam-editbox"><label>Personal notes<textarea data-glam-notes="${esc(p.id)}" maxlength="500" placeholder="e.g. keep this on my weekly farm list">${esc(p.notes)}</textarea></label><div class="glam-edit-actions"><button type="button" class="btn primary small" data-glam-save="${esc(p.id)}">Save notes</button><button type="button" class="btn small ghost" data-glam-edit="${esc(p.id)}">Cancel</button></div></div>`:''}
   </article>`;
  }
- function render(){const count=pieces.filter(x=>x.collected).length, steps=pieces.reduce((n,p)=>n+p.steps.filter(x=>x.done).length,0);
-  $('glamStats').innerHTML=`<article class="glam-stat"><strong>${pieces.length}</strong><span>Pieces on your wishlist</span></article><article class="glam-stat"><strong>${count}</strong><span>Collected</span></article><article class="glam-stat"><strong>${steps}</strong><span>Farming steps completed</span></article>`;
+ function render(){
+  const collected=pieces.filter(p=>p.collected).length;
+  $('glamStats').innerHTML=`<article class="glam-stat"><strong>${pieces.length}</strong><span>Pieces in your wardrobe</span></article><article class="glam-stat"><strong>${collected}</strong><span>Collected</span></article><article class="glam-stat"><strong>${pieces.length-collected}</strong><span>Still to collect</span></article>`;
   const shown=pieces.filter(p=>filter==='all'||(filter==='collected'?p.collected:!p.collected));
-  $('glamBoard').innerHTML=shown.length?shown.map(card).join(''):`<div class="glam-empty"><strong>${pieces.length?'Nothing in this filter yet':'Your wardrobe starts here ✦'}</strong>${pieces.length?'Choose another status to see more pieces.':'Search above or select one of the verified farming guides to add your first piece.'}</div>`;
+  $('glamBoard').innerHTML=shown.length?shown.map(card).join(''):`<div class="glam-empty"><strong>${pieces.length?'Nothing in this filter yet':'Your wardrobe starts here ✦'}</strong>${pieces.length?'Try another filter.':'Search above or choose a starter suggestion to add your first piece.'}</div>`;
  }
- function paintResults(items){
-  results=items;
-  $('glamResults').innerHTML=items.map((r,i)=>`<button type="button" class="glam-result ${r.manual?'glam-manual-result':''}" data-glam-result="${i}"><span><b>${r.manual?'Use this name: ':''}${esc(r.name)}</b><small>${r.manual?'＋ Add a custom farming tile · route to verify':r.verified?'✓ Ready-made farming instructions':'XIVAPI item match · acquisition needs verification'}${r.level?' · Lv '+r.level:''}</small></span><i>＋</i></button>`).join('');
+ // XIVAPI search uses REQUIRED partial-name clauses. Unlike searching the whole
+ // phrase, +Name~"Yuweyawata" +Name~"aiming" matches all those words anywhere.
+ function buildQuery(q){return words(q).map(w=>'+Name~"'+w.replace(/["\\]/g,'')+'"').join(' ')}
+ async function exactItemId(name){
+  const query='Name="'+name.replace(/["\\]/g,'')+'"';
+  const url='https://v2.xivapi.com/api/search?'+new URLSearchParams({sheets:'Item',fields:'Name',query,limit:'10',language:'en'});
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
+  try{const resp=await fetch(url,{mode:'cors',signal:controller.signal});if(!resp.ok)throw Error('HTTP '+resp.status);const data=await resp.json();const matched=(data.results||[]).find(r=>norm(r.fields?.Name)===norm(name));return itemId(matched?.row_id)}finally{clearTimeout(timer)}
  }
- function offlineResults(q){
-  const name=String(q||'').replace(/\s+/g,' ').trim();
-  const picks=localResults(name).map(x=>({...x,verified:true}));
-  if(name.length>=2&&!picks.some(x=>x.name.toLowerCase()===name.toLowerCase()))picks.push({name,manual:true,verified:false});
-  return picks;
- }
- function matchPreset(q){paintResults(offlineResults(q));}
- // A failed or blocked API request must never leave the user with an empty search.
- // The custom-item result is always available and clearly distinguishes an unverified route.
  async function search(){
-  const q=$('glamSearch').value.replace(/\s+/g,' ').trim();
-  const seq=++searchSeq;clearTimeout(searchTimer);
-  if(q.length<2){matchPreset(q);status('Enter at least two characters to search; verified guides work offline.');return}
-  const local=offlineResults(q);
-  paintResults(local);
-  if(q.length>80){status('The live database accepts up to 80 characters here. You can still add this item as a custom farming tile.');return}
-  status('Checking live XIVAPI item names… Offline and custom results are already available.');
-  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),12000);
+  const q=$('glamSearch').value.replace(/\s+/g,' ').trim(),n=++seq;
+  clearTimeout(debounce);const starters=localResults(q);
+  drawResults(starters,q);
+  if(q.length<2){status('Enter at least two characters. Search terms may appear anywhere in the name.');return}
+  if(q.length>100){status('Search for fewer than 100 characters, or add your text as a custom item.');return}
+  status('Searching XIVAPI for all words: '+words(q).join(' + ')+'…');
+  const unique=new Map(starters.map(x=>[norm(x.name),x]));
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),18000);
+  let cursor='',pages=0,foundOnline=0,limited=false;
   try{
-   const clause=`Name~"${q.replace(/["\\]/g,'')}"`;
-   const url='https://v2.xivapi.com/api/search?'+new URLSearchParams({sheets:'Item',fields:'Name,LevelEquip',query:clause,limit:'30',language:'en'});
-   const response=await fetch(url,{signal:ctrl.signal,mode:'cors'});
-   if(!response.ok)throw Error('HTTP '+response.status);
-   const json=await response.json();
-   if(seq!==searchSeq)return;
-   if(!Array.isArray(json.results))throw Error('Unexpected API result');
-   const verified=local.filter(x=>x.verified),seen=new Set(verified.map(x=>x.name.toLowerCase()));
-   const online=[],apiNames=new Set(),alreadyShown=new Set();
-   for(const r of json.results){
-    const name=typeof r?.fields?.Name==='string'?r.fields.Name.trim():'';
-    if(!name)continue;
-    const key=name.toLowerCase();
-    if(apiNames.has(key))continue;
-    apiNames.add(key);
-    // Count XIVAPI matches *before* filtering results already present in the offline catalogue.
-    // Previously a successful exact-name search misleadingly displayed "0 live matches".
-    if(seen.has(key)){alreadyShown.add(key);continue}
-    seen.add(key);const preset=getResult(name);
-    online.push({name,level:Number(r.fields?.LevelEquip)||0,verified:!!preset,...(preset||{})});
-   }
-   const available=[...verified,...online].slice(0,29);
-   // Retain a manual entry whenever no exact match has been returned.
-   if(!available.some(x=>x.name.toLowerCase()===q.toLowerCase()))available.push({name:q,manual:true,verified:false});
-   paintResults(available);
-   if(apiNames.size){
-    status(`✓ XIVAPI connected · ${apiNames.size} item match(es) found online (${alreadyShown.size} already displayed as built-in guides, ${online.length} additional item(s)). Acquisition routes for non-curated items still need verification.`);
-   }else{
-    status(`✓ XIVAPI connected · No item-name matches for “${q}”. Try a shorter search term, or add this item manually.`);
-   }
+   do{
+    const url='https://v2.xivapi.com/api/search?'+new URLSearchParams(cursor?
+      {fields:'Name,LevelEquip',cursor,limit:'100'}:
+      {sheets:'Item',fields:'Name,LevelEquip',query:buildQuery(q),limit:'100',language:'en'});
+    const response=await fetch(url,{mode:'cors',signal:controller.signal});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    const data=await response.json();if(n!==seq)return;
+    if(!Array.isArray(data.results))throw Error('Unexpected XIVAPI response');
+    for(const row of data.results){
+     const name=typeof row?.fields?.Name==='string'?row.fields.Name.trim():'';
+     if(!name||!matches(name,q))continue;
+     const key=norm(name),id=itemId(row.row_id);
+     if(!unique.has(key))foundOnline++;
+     const prev=unique.get(key)||{};
+     unique.set(key,{...prev,name,level:Number(row.fields.LevelEquip)||prev.level||0,itemId:id||prev.itemId||null,offline:!!prev.offline});
+    }
+    // Show results as the pages arrive, without losing the user's search context.
+    drawResults([...unique.values()],q);
+    cursor=typeof data.next==='string'?data.next:'';
+    pages++;
+    limited=!!cursor&&pages>=10;
+   }while(cursor&&pages<10);
+   if(n!==seq)return;
+   status(`✓ Live partial search · ${unique.size} matching item(s) found (${foundOnline} beyond starter suggestions). Every keyword must match.${limited?' Showing first 1,000 results; narrow your search to see more.':''}`);
   }catch(e){
-   if(seq!==searchSeq)return;
-   paintResults(local);
-   status(`Live search unavailable (${e?.name==='AbortError'?'request timed out':String(e?.message||'network/CORS error').slice(0,75)}). Test the XIVAPI link above; if it works but this search does not, try hosting the app over HTTPS. You can still add an item by name.`);
+   if(n!==seq)return;
+   if(unique.size)drawResults([...unique.values()],q);
+   status(`Live lookup unavailable (${e?.name==='AbortError'?'timed out':String(e?.message||'network error').slice(0,90)}). Starter suggestions and custom entries still work.`);
   }finally{clearTimeout(timeout)}
  }
- // Unlike a JSON link opened in a new tab, this tests fetch/CORS from the app's own origin.
  async function testLiveSearch(){
-  const button=$('glamTestLive');if(button.disabled)return;
-  button.disabled=true;clearTimeout(searchTimer);++searchSeq;
-  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
-  status('Testing a live XIVAPI request from this website…');
-  try{
-   const url='https://v2.xivapi.com/api/search?'+new URLSearchParams({sheets:'Item',fields:'Name',query:'Name~"Edenmorn"',limit:'3',language:'en'});
-   const response=await fetch(url,{signal:controller.signal,mode:'cors'});
-   if(!response.ok)throw Error('HTTP '+response.status);
-   const data=await response.json();
-   if(!Array.isArray(data.results))throw Error('Unexpected API response');
-   status(`✓ Live search connected from your website! XIVAPI returned ${data.results.length} sample item(s). Search above for any glamour piece.`);
-  }catch(e){
-   status(`✕ Live search test failed from this website (${e?.name==='AbortError'?'request timed out':String(e?.message||'network/CORS issue').slice(0,100)}). Opening JSON in another tab does not bypass CORS; check browser developer tools for details.`);
-  }finally{clearTimeout(timeout);button.disabled=false}
+  const btn=$('glamTestLive');if(btn.disabled)return;btn.disabled=true;clearTimeout(debounce);++seq;
+  status('Testing XIVAPI from your website…');
+  try{const id=await exactItemId('Edenmorn Coat of Fending');status(id?`✓ Live item lookup works! Found item #${id}. Try “Yuweyawata aiming” for an all-keywords search.`:'XIVAPI responded but the test item was not found. Try a different search.');}
+  catch(e){status('Live XIVAPI test failed: '+String(e?.message||e).slice(0,100))}
+  finally{btn.disabled=false}
  }
- $('glamTestLive').addEventListener('click',testLiveSearch);
  $('glamSearch').addEventListener('input',e=>{
-  const q=e.target.value.trim();clearTimeout(searchTimer);searchSeq++;
-  matchPreset(q);
-  if(q.length<2){status('Type at least two characters; verified guides work offline.');return}
-  status('Showing matching offline guides and a custom-item option; searching online shortly…');
-  searchTimer=setTimeout(search,550);
+  ++seq;clearTimeout(debounce);const q=e.target.value.replace(/\s+/g,' ').trim();
+  drawResults(localResults(q),q);
+  status(q.length<2?'Enter at least two characters to search.':'Showing starter suggestions; searching online in a moment…');
+  if(q.length>=2)debounce=setTimeout(search,450);
  });
  $('glamSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();search()}});
  $('glamSearchBtn').addEventListener('click',search);
  $('glamAddTyped').addEventListener('click',()=>add($('glamSearch').value));
- $('glamFilter').addEventListener('change',e=>{filter=e.target.value;render()});
+ $('glamTestLive').addEventListener('click',testLiveSearch);
  $('glamQuickPicks').innerHTML=CATALOG.slice(0,7).map(x=>`<button type="button" data-glam-quick="${esc(x.name)}">＋ ${esc(x.name)}</button>`).join('');
- $('glamQuickPicks').addEventListener('click',e=>{const b=e.target.closest('[data-glam-quick]');if(b)add(b.dataset.glamQuick)});
- $('glamResults').addEventListener('click',e=>{const b=e.target.closest('[data-glam-result]');if(b&&results[Number(b.dataset.glamResult)])add(results[Number(b.dataset.glamResult)].name)});
- $('glamBoard').addEventListener('change',e=>{const t=e.target;if(t.dataset.glamCollected){const p=pieces.find(x=>x.id===t.dataset.glamCollected);if(p){p.collected=t.checked;save();render()}}else if(t.dataset.glamStep){const p=pieces.find(x=>x.id===t.dataset.glamStep),s=p?.steps[Number(t.dataset.index)];if(s){s.done=t.checked;save();render()}}});
-
- async function autoFill(id){const piece=pieces.find(x=>x.id===id);if(!piece)return;
-  wikiStatus[id]='Looking up the FFXIV Wiki acquisition section…';render();
-  const q=new URLSearchParams({action:'parse',format:'json',prop:'text',page:piece.name,origin:'*'});
-  let steps=[],lastError='';
-  for(const base of ['https://ffxiv.consolegameswiki.com/mediawiki/api.php','https://ffxiv.consolegameswiki.com/api.php']){
-   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);
-   try {const response=await fetch(base+'?'+q,{signal:controller.signal,mode:'cors'});if(!response.ok)throw Error('Source returned HTTP '+response.status);
-    const json=await response.json();if(json.error||!json.parse?.text?.['*'])throw Error('This item page has no readable acquisition section.');
-    const doc=new DOMParser().parseFromString(json.parse.text['*'],'text/html');
-    const anchor=doc.querySelector('#Acquisition, [id="Acquisition"]');const heading=anchor?.closest('h2,h3,h4')||anchor?.parentElement;
-    if(!heading)throw Error('No Acquisition heading was found.');
-    let subsection='Acquisition';
-    for(let node=heading.nextElementSibling;node&&steps.length<8;node=node.nextElementSibling){
-     if(node.matches('h2'))break;
-     if(node.matches('h3,h4')){subsection=node.textContent.trim().replace(/\s+/g,' ').slice(0,60);continue}
-     if(node.matches('p')){const t=node.textContent.trim().replace(/\s+/g,' ');if(t.length>18&&t.length<280)steps.push(`${subsection}: ${t}`)}
-     if(node.matches('ul,ol'))for(const li of [...node.querySelectorAll(':scope > li')].slice(0,5)){const t=li.textContent.trim().replace(/\s+/g,' ');if(t&&t.length<260)steps.push(`${subsection}: ${t}`)}
-     if(node.matches('table'))for(const row of [...node.querySelectorAll('tr')].slice(1,4)){
-      const cells=[...row.querySelectorAll(':scope > td')].map(c=>c.textContent.trim().replace(/\s+/g,' ')).filter(Boolean);
-      if(cells.length>1){const text=cells.slice(0,5).join(' · ').slice(0,260);if(text.length>10)steps.push(`${subsection}: ${text}`)}
-     }
-    }
-    if(!steps.length)throw Error('No structured acquisition steps could be extracted.');
-    break;
-   }catch(e){lastError=String(e.message||e);steps=[]}finally{clearTimeout(timer)}
-  }
-  if(!pieces.includes(piece))return;
-  if(!steps.length){wikiStatus[id]='Automatic wiki lookup was unavailable ('+lastError.slice(0,85)+'). Open Item acquisition to read the page, then use Edit steps to record your route.';render();return}
-  piece.steps=steps.slice(0,8).map(text=>({text:text.slice(0,350),done:false}));piece.source='Community FFXIV Wiki acquisition · verify details';piece.group='Other';piece.verified=false;editingId='';save();wikiStatus[id]='Acquisition information imported from a community page. Check the linked source for accuracy and current availability.';render();
- }
- $('glamBoard').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
-  if(d.glamAutofill){autoFill(d.glamAutofill);return}
+ $('glamQuickPicks').addEventListener('click',e=>{const el=e.target.closest('[data-glam-quick]');if(el)add(el.dataset.glamQuick)});
+ $('glamResults').addEventListener('click',e=>{const el=e.target.closest('[data-glam-result]');if(el&&results[Number(el.dataset.glamResult)])add(results[Number(el.dataset.glamResult)])});
+ $('glamFilter').addEventListener('change',e=>{filter=e.target.value;render()});
+ $('glamBoard').addEventListener('change',e=>{const el=e.target;const id=el.dataset.glamCollected;if(!id)return;const p=pieces.find(x=>x.id===id);if(p){p.collected=el.checked;save();render()}});
+ $('glamBoard').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
   if(d.glamEdit){editingId=editingId===d.glamEdit?'':d.glamEdit;deleteId='';render();return}
   if(d.glamDelete){deleteId=d.glamDelete;editingId='';render();return}
-  if('glamDeleteCancel' in d){deleteId='';render();return}
-  if(d.glamDeleteConfirm){pieces=pieces.filter(x=>x.id!==d.glamDeleteConfirm);deleteId='';editingId='';save();render();return}
-  if(d.glamSave){const id=d.glamSave,p=pieces.find(x=>x.id===id);if(!p)return;
-   const src=$('glamBoard').querySelector(`[data-glam-field-source="${CSS.escape(id)}"]`),category=$('glamBoard').querySelector(`[data-glam-field-group="${CSS.escape(id)}"]`),steps=$('glamBoard').querySelector(`[data-glam-field-steps="${CSS.escape(id)}"]`),notes=$('glamBoard').querySelector(`[data-glam-field-notes="${CSS.escape(id)}"]`);
-   if(!src||!category||!steps||!notes)return;
-   const lines=steps.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,18);if(!lines.length){status('Add at least one farming instruction.');return}
-   p.steps=lines.map(text=>({text:text.slice(0,350),done:p.steps.find(s=>s.text===text)?.done===true}));p.source=src.value.trim().slice(0,180)||'Source to verify';p.group=category.value;p.notes=notes.value.trim().slice(0,500);
-   p.verified=!!getResult(p.name)&&p.source===getResult(p.name).source&&p.steps.map(s=>s.text).join('|')===getResult(p.name).steps.join('|');
-   editingId='';save();render();status('Updated farming plan for '+p.name+'.');
-  }
+  if('glamCancel' in d){deleteId='';render();return}
+  if(d.glamConfirm){pieces=pieces.filter(p=>p.id!==d.glamConfirm);deleteId='';editingId='';save();render();return}
+  if(d.glamSave){const p=pieces.find(x=>x.id===d.glamSave);const field=p&&$('glamBoard').querySelector(`[data-glam-notes="${CSS.escape(p.id)}"]`);if(!field)return;p.notes=field.value.trim().slice(0,500);editingId='';save();render();status('Saved notes for '+p.name+'.');return}
+  if(d.glamResolve){const p=pieces.find(x=>x.id===d.glamResolve);if(!p)return;b.disabled=true;b.textContent='Searching…';try{const id=await exactItemId(p.name);if(id){p.itemId=id;save();render();status('Direct Garland Tools link ready for '+p.name+'.')}else{b.textContent='Try again';status('No exact item match for '+p.name+'. You can still find it via Lodestone search or Garland Tools search.')}}catch(err){b.textContent='Try again';status('Could not look up an item ID: '+String(err?.message||err).slice(0,100))}finally{b.disabled=false}return}
  });
  window.EorzeaGlam={export:()=>JSON.parse(JSON.stringify(pieces)),import:v=>{pieces=sanitize(v);save();render()},add};
  document.querySelector('[data-main-view="glam"]').addEventListener('click',render);
- matchPreset('');render();
+ drawResults(CATALOG.slice(0,12).map(x=>({...x,offline:true})), '');render();
 })();
 </script>
 </body>
