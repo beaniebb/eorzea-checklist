@@ -1251,7 +1251,13 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
   {pattern:/^(?:alexandrian|midan|gordian|dreadwyrm|genji|deltascape|sigmascape|alphascape|edenchoir|edencall|edengate|edengrace|edenmete|edenmorn|pandæmonium|pandemonium)\b/i,label:'Raid Gear / Trade for Tokens',icon:'⚔️',kind:'set'},
   {pattern:/^(?:panthean|theogonic|obsolete android|hypostatic)\b/i,label:'Alliance Raid Gear',icon:'🏰',kind:'set'},
   {pattern:/^(?:manalis|ktiseos|paglth.an|vanguard|darbar)\b/i,label:'Dungeon Gear',icon:'🗝️',kind:'set'},
-  {pattern:/^(?:augmented shire|augmented scaevan|augmented cryptlurker|augmented lunar envoy|augmented credendum)\b/i,label:'Trade for Tomestones',icon:'🪙',kind:'set'}
+  {pattern:/^(?:augmented shire|augmented scaevan|augmented cryptlurker|augmented lunar envoy|augmented credendum)\b/i,label:'Trade for Tomestones',icon:'🪙',kind:'set'},
+  // Verified Field Operations gear families. A family badge is a source suggestion,
+  // not a promise that every acquisition route or vendor has been identified.
+  {pattern:/^(?:augmented )?(?:bozjan|law[’']s order|blade[’']s)\b/i,label:'Field Operations',icon:'🏕️',kind:'set'},
+  {pattern:/^(?:augmented )?(?:elemental|eurekan|anemos|pagos)\b/i,label:'Field Operations',icon:'🏕️',kind:'set'},
+  {pattern:/^(?:arcanaut[’']s|phantom vision)\b/i,label:'Field Operations',icon:'🏕️',kind:'set'},
+  {pattern:/^(?:kirin[’']s osode|vermilion cloak)\b/i,label:'Field Operations',icon:'🏕️',kind:'set'}
  ];
  const SOURCE_CHOICES=[
   ['tomes','🪙','Trade for Tomestones'],
@@ -1266,6 +1272,7 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
   ['quest','📜','Quest Reward'],
   ['hunt','🎯','Hunt Exchange'],
   ['fate','💠','FATE / Gemstone Exchange'],
+  ['fieldops','🏕️','Field Operations'],
   ['gold','🎲','Gold Saucer'],
   ['maps','🗺️','Treasure Maps'],
   ['retainer','🎒','Retainer Ventures'],
@@ -1285,7 +1292,9 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
   if(match&&Array.isArray(match.sources)){
    const found=[];
    for(const src of match.sources){
-    const choice=SOURCE_CHOICES.find(x=>x[0]===src.category);
+    // Migrate older auto-generated FieldOpCoffer entries tagged as generic 'other'.
+    const category=src.category==='other'&&/FieldOpCoffer/i.test(String(src.detail||''))?'fieldops':src.category;
+    const choice=SOURCE_CHOICES.find(x=>x[0]===category);
     if(!choice)continue;
     if(found.some(x=>x.label===choice[2]))continue;
     found.push({label:choice[2],icon:choice[1],kind:'catalogue',detail:String(src.detail||'').slice(0,240),origin:match.origin||'supplemental'});
@@ -1311,7 +1320,7 @@ setInterval(()=>{const now=cycle('daily')+cycle('weekly');if(now!==last){last=no
    const safe=Object.create(null);let count=0;
    for(const [id,entry] of Object.entries(data.items)){
     if(!itemId(id)||!entry||!Array.isArray(entry.sources))continue;
-    const list=entry.sources.filter(x=>x&&SOURCE_CHOICES.some(choice=>choice[0]===x.category)).slice(0,12).map(x=>({category:x.category,detail:String(x.detail||'').slice(0,240)}));
+    const list=entry.sources.filter(x=>x&&(SOURCE_CHOICES.some(choice=>choice[0]===x.category)||(x.category==='other'&&/FieldOpCoffer/i.test(String(x.detail||''))))).slice(0,12).map(x=>({category:x.category==='other'&&/FieldOpCoffer/i.test(String(x.detail||''))?'fieldops':x.category,detail:String(x.detail||'').slice(0,240)}));
     if(list.length){safe[id]={sources:list,origin:String(entry.origin||'Community data').slice(0,90)};count++}
    }
    itemSources=safe;catalogueState='ready';
